@@ -1,0 +1,23 @@
+### Create environment "tttr" - change name as you like
+
+conda create --name tttr python=3.7.11
+
+conda activate tttr
+
+
+### Install required packages
+### CAVE: FCSArtifactFixer is not currently compatible with the latest tttrlib version due to changed behavior of the tttrlib.Correlator class!
+
+conda install numpy scipy matplotlib pandas lmfit
+
+pip install jupyter uncertainties
+
+conda install -c tpeulen tttrlib=0.0.19
+
+
+
+### Known issue: If Jupyter Notebook does not find tttrlib, but execution of a .py file does, do this:
+
+pip install ipykernel 
+
+python -m ipykernel install --user
