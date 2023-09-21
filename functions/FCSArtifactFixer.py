@@ -158,6 +158,7 @@ class Parallel_scheduler():
         self.correlation_method = correlation_method
         self.cross_corr_symm = cross_corr_symm
         self.use_calibrated_AP_subtraction = use_calibrated_AP_subtraction
+        self.afterpulsing_params_path = afterpulsing_params_path
         self.use_burst_removal = use_burst_removal
         self.use_drift_correction = use_drift_correction
         self.use_mse_filter = use_mse_filter
@@ -237,7 +238,7 @@ class Parallel_scheduler():
                                    cross_corr_symm = cross_corr_symm,
                                    correlation_method = correlation_method,
                                    subtract_afterpulsing = use_calibrated_AP_subtraction,
-                                   afterpulsing_params_path = 'ap_params_D044.csv',
+                                   afterpulsing_params_path = afterpulsing_params_path,
                                    write_results = True,
                                    include_header = False,
                                    write_log = True)
@@ -283,19 +284,20 @@ class Parallel_scheduler():
 
         print(f'[{process_id}] Processing ' + self.in_paths[process_id] + '...')
 
-        self.run_standard_pipeline_all_channels(self.in_paths[process_id],
-                                                self.tau_min,
-                                                self.tau_max, 
-                                                self.sampling,
-                                                self.correlation_method,
-                                                self.cross_corr_symm,
-                                                self.use_calibrated_AP_subtraction,
-                                                self.use_burst_removal,
-                                                self.use_drift_correction,
-                                                self.use_mse_filter,
-                                                self.use_flcs_bg_corr,
+        self.run_standard_pipeline_all_channels(in_path = self.in_paths[process_id],
+                                                tau_min = self.tau_min,
+                                                tau_max = self.tau_max, 
+                                                sampling = self.sampling,
+                                                use_calibrated_AP_subtraction = self.use_calibrated_AP_subtraction,
+                                                use_burst_removal = self.use_burst_removal,
+                                                use_drift_correction = self.use_drift_correction,
+                                                use_mse_filter = self.use_mse_filter,
+                                                use_flcs_bg_corr = self.use_flcs_bg_corr,
+                                                afterpulsing_params_path = self.afterpulsing_params_path,
+                                                cross_corr_symm = self.cross_corr_symm,
+                                                correlation_method = self.correlation_method,
                                                 job_name = f'process_{process_id}')
-        
+
         
     def run_parallel_processing(self,
                                 process_count):
@@ -1671,7 +1673,7 @@ class FCSArtifactFixer():
             
         else:
             if self._subtract_afterpulsing:
-                raise ValueError("Invalid input encountered for afterpulsing_params_path. If subtract_afterpulsing is set to True, this must be a valid file path string including file type suffix, referring to a correctly formatted calibration file.")
+                raise ValueError("Invalid input encountered for afterpulsing_params_path. If subtract_afterpulsing is set to True, this must be a valid file path string including file type suffix, referring to a correctly formatted calibration file. Got: " + str(afterpulsing_params_path))
             
             else:
                 # Not used anyway, so we can ignore the invalid input and leave an empty dummy
