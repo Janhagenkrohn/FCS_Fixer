@@ -11,7 +11,7 @@ Created on Tue Apr 25 08:19:58 2023
 This script finally is similar to 03_batch_processing.py, but accelerates 
 processing through parallel computing. 
 
-For this we use another smaller class within FCSArtifactFixer, called Parallel_scheduler.
+For this we use another smaller class within FCS_Fixer, called Parallel_scheduler.
 Parallel_scheduler accepts essentially the same "global" parameters as FCSArtfactFixer 
 itself, with the addition of in_paths, which is a list of paths to the files to process.
 
@@ -28,12 +28,12 @@ import os
 import sys
 import glob
 
-# For localizing FCSArtifactFixer
+# For localizing FCS_Fixer
 repo_dir = os.path.abspath('..')
 
 # For data processing
 sys.path.insert(0, repo_dir)
-from functions import FCSArtifactFixer
+from functions import FCS_Fixer
 
 
 #%% Input data
@@ -76,7 +76,7 @@ for dir_name in dir_names:
 #%% Iterate over data
 in_paths=[os.path.join(_dir_names[i],file_name) for i, file_name in enumerate(_file_names)]
 
-scheduler = FCSArtifactFixer.Parallel_scheduler(in_paths,
+scheduler = FCS_Fixer.Parallel_scheduler(in_paths,
                                                  tau_min = tau_min,
                                                  tau_max = tau_max,  
                                                  sampling = sampling,

@@ -1,0 +1,2407 @@
+
+
+
+---------------------------------------------
+---------------------------------------------
+Creation:
+2023-09-24, 10:37:48
+0 output files generated so far.
+
+Writing output into /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655.
+
+Overview over loaded TTTR data:
+3814275 photons in total
+Channels in use and how many photons are in each of them:
+0: 495980, 1: 1266554, 2: 1474502, 3: 571081, 4: 3550, 5: 2608
+60.74684798423993 s acquisition time
+6250 micro time bins
+62.500312501562505 ns macro time resolution
+0.009999999960041972 ns micro time resolution
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+set_afterpulsing_params: Setting afterpulsing calibration parameters
+2023-09-24, 10:37:48
+0 output files generated so far.
+
+Created dummy afteroulsing calibration parameters
+Parameters:
+A1[GHz], tau1[ns], A2[GHz], tau2[ns]:
+[[0. 1. 0. 1.]
+ [0. 1. 0. 1.]
+ [0. 1. 0. 1.]
+ [0. 1. 0. 1.]
+ [0. 1. 0. 1.]
+ [0. 1. 0. 1.]]
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:37:48
+0 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184975
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:37:48
+0 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1381191
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_correlation_uncertainty)
+2023-09-24, 10:37:51
+0 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 1146.8257341286708, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 1.950677864461653e-05
+Second correlation channel: 2.273687961568527e-05
+
+Calculated as two-channel cross-correlation function with assumption of time symmetry.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:37:51
+0 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 121030
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:37:51
+0 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 141277
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_segment_ccs)
+2023-09-24, 10:37:51
+0 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 1146.8257341286708, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 1.9923674413588095e-05
+Second correlation channel: 2.3256751182398557e-05
+
+Calculated as two-channel cross-correlation function with assumption of time symmetry.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_segment_ccs: Calculate correlation functions with filters for evenly spaces time segments of the measurement.
+(Called by get_Wohland_SD)
+2023-09-24, 10:37:55
+1 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: 6.074684798423992
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Split time trace of length 60.7 s into 10 segments, of which 10 were usable.
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/00_segment_CCFs_symm_ch1_ch2.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_Wohland_SD: Calculate correlation functions uncertainty using Wohland method.
+(Called by get_correlation_uncertainty)
+2023-09-24, 10:37:55
+1 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: 6.074684798423992
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+  
+Used 10 segments for uncertainty estimation.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_correlation_uncertainty: Calculate correlation function and uncertainty.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:37:55
+2 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+default_uncertainty_method (whether to try Wohland method SD calculation or directly use bootstrap): Wohland
+minimum_window_length (shortest allowed window length) [s]: []
+n_bootstrap_reps (number of bootstrap replicates to perform) 10
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: None, None
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Results written to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/01_CCF_symm_ch1_ch2.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_trace_time_scale)
+2023-09-24, 10:37:56
+2 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184975
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:37:56
+2 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184975
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:37:56
+2 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184975
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_trace_time_scale)
+2023-09-24, 10:37:57
+2 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 20000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 20971.564857824287, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 1.950678922143287e-05
+Second correlation channel: 1.950678922143287e-05
+
+Calculated as auto-correlation function.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_trace_time_scale: Automatically estimate a reasonable time trace bin width from data.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:37:57
+2 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+min_avg_counts (criterion 1: minimum average counts per bin): 10.0
+min_bin_width (criterion 2: minimum absolute bin width) [s]: 0.0001
+use_tau_diff (whether to use diffusion time estimate as criterion 3): True
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+
+Used short diffusion time from 2-component fit as criterion 3.
+
+Fit results:
+N: 16.156295078878816
+Diffusion times [s]: 0.0026170076695399835, 0.002617011123300556
+Fractions: 0.5016190816138039, 0.49838091838619614
+Offset: 0.006979910090700222
+
+1. time_for_min_avg_counts [ns]: 512642.44380041707
+2. min_bin_width [ns]: 100000.0
+3. tau_diff [ns]: 2617007.6695399834
+
+Settled for time_trace_sampling [ns]: 2617007.6695399834
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_trace_time_scale)
+2023-09-24, 10:37:57
+2 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1381191
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:37:57
+2 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1381191
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:37:57
+2 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1381191
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_trace_time_scale)
+2023-09-24, 10:37:58
+2 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 20000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 20971.564857824287, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 2.273687961568527e-05
+Second correlation channel: 2.273687961568527e-05
+
+Calculated as auto-correlation function.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_trace_time_scale: Automatically estimate a reasonable time trace bin width from data.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:37:58
+2 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+min_avg_counts (criterion 1: minimum average counts per bin): 10.0
+min_bin_width (criterion 2: minimum absolute bin width) [s]: 0.0001
+use_tau_diff (whether to use diffusion time estimate as criterion 3): True
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+
+Used short diffusion time from 2-component fit as criterion 3.
+
+Fit results:
+N: 12.366210582607463
+Diffusion times [s]: 0.0025950440130158015, 0.002595045069577343
+Fractions: 0.5062158829853654, 0.49378411701463465
+Offset: 0.006929988508268473
+
+1. time_for_min_avg_counts [ns]: 439814.9711679262
+2. min_bin_width [ns]: 100000.0
+3. tau_diff [ns]: 2595044.0130158016
+
+Settled for time_trace_sampling [ns]: 2595044.0130158016
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_time_trace)
+2023-09-24, 10:37:58
+2 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184975
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_time_trace: Bin photons into time trace, applying filters.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:37:59
+3 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+time_trace_sampling (time trace bin width) [s]: 0.002606002702388501
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Split 60.7 s long acquisition into 23310 bins with an average of 50.83470613470613 counts per bin.
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/02_Trace_ch1.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_time_trace)
+2023-09-24, 10:37:59
+3 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1381191
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_time_trace: Bin photons into time trace, applying filters.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:38:00
+4 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+time_trace_sampling (time trace bin width) [s]: 0.002606002702388501
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Split 60.7 s long acquisition into 23310 bins with an average of 59.25212355212355 counts per bin.
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/03_Trace_ch2.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_auto_threshold: Estimate a reasonable threshold photon count value from data using statistical criteria.
+(Called by threshold_trace)
+2023-09-24, 10:38:00
+4 output files generated so far.
+
+Parameters used:
+time_trace: pre-binned photon time trace of length 23310 and an average of 50.83470613470613 counts per bin
+threshold_alpha (approx. false-positive thresholding rate to be allowed by threshold): 0.05
+
+Approximated the photon count distribution as a Gaussian with mean 50.0 and standard deviation 11.0.
+Based on that, settled for a threshold of 100.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+threshold_trace: Apply threshold to a pre-binned time trace to detect bursts.
+(Called by run_burst_removal)
+2023-09-24, 10:38:00
+4 output files generated so far.
+
+Parameters used:
+time_trace: pre-binned photon time trace of length 23310 and an average of 50.83470613470613 counts per bin
+threshold_alpha (approx. false-positive thresholding rate to be allowed in case of auto-thresholding): 0.05
+-> Auto-thresholding used: True
+threshold_counts (actual threshold used): 100
+
+Thresholded the time trace, identifying 0 bins as bursts. 
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_auto_threshold: Estimate a reasonable threshold photon count value from data using statistical criteria.
+(Called by threshold_trace)
+2023-09-24, 10:38:00
+4 output files generated so far.
+
+Parameters used:
+time_trace: pre-binned photon time trace of length 23310 and an average of 59.25212355212355 counts per bin
+threshold_alpha (approx. false-positive thresholding rate to be allowed by threshold): 0.05
+
+Approximated the photon count distribution as a Gaussian with mean 59.0 and standard deviation 13.0.
+Based on that, settled for a threshold of 118.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+threshold_trace: Apply threshold to a pre-binned time trace to detect bursts.
+(Called by run_burst_removal)
+2023-09-24, 10:38:00
+4 output files generated so far.
+
+Parameters used:
+time_trace: pre-binned photon time trace of length 23310 and an average of 59.25212355212355 counts per bin
+threshold_alpha (approx. false-positive thresholding rate to be allowed in case of auto-thresholding): 0.05
+-> Auto-thresholding used: True
+threshold_counts (actual threshold used): 118
+
+Thresholded the time trace, identifying 3 bins as bursts. 
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+update_photons_from_bursts: Use thresholded (re-binned) time trace to update photon information.
+(Called by run_burst_removal)
+2023-09-24, 10:38:06
+4 output files generated so far.
+
+Parameters used:
+  burst_bins: thresholded, binary, time trace with 23310 bins of which 3 are labelled as burst bins
+  time_trace_sampling (time trace bin width) [s]: 0.002606002702388501
+  update_weights (whether to label the burst photons as photons to exclude from processed by setting their weights to 0): True
+  update_macro_times (whether to update the macro time labled to close gaps in the photon stream created by discarding burst photons): True
+  
+  Out of 3814275 photons included in burst annotation, 802 were actually labelled as burst photons.
+  
+
+
+
+---------------------------------------------
+---------------------------------------------
+run_burst_removal: Use one or multiple time traces for burst removal.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:38:07
+5 output files generated so far.
+
+Parameters used:
+  time_trace: 2 pre-binned photon time traces of length 23310 and averages of [50.83470613 59.25212355] counts per bin
+  time_trace_sampling (time trace bin width) [s]: 0.002606002702388501
+  threshold_alpha (approx. false-positive thresholding rate to be allowed in case of auto-thresholding): 0.05
+  threshold_counts (actual threshold used): None
+  update_weights (whether to label the burst photons as photons to exclude from processed by setting their weights to 0): True
+  update_macro_times (whether to update the macro time labled to close gaps in the photon stream created by discarding burst photons): True
+  
+  Joint burst detection in 2 traces via logical OR.
+  Overall detected 3 burst bins in 23310 bins.  
+  Out of 3814275 photons included in burst annotation, 802 were actually labelled as burst photons.
+  Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/04_Burst_annotationOR_of_2_traces.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:07
+5 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184740
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:07
+5 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1380825
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_correlation_uncertainty)
+2023-09-24, 10:38:09
+5 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 1146.8257341286708, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 1.950541308655695e-05
+Second correlation channel: 2.2733771827766796e-05
+
+Calculated as two-channel cross-correlation function with assumption of time symmetry.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:09
+5 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 121006
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:09
+5 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 141258
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_segment_ccs)
+2023-09-24, 10:38:09
+5 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 1146.8257341286708, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 1.9922399329509438e-05
+Second correlation channel: 2.3256551259726386e-05
+
+Calculated as two-channel cross-correlation function with assumption of time symmetry.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_segment_ccs: Calculate correlation functions with filters for evenly spaces time segments of the measurement.
+(Called by get_Wohland_SD)
+2023-09-24, 10:38:13
+6 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: 6.073905288276442
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Split time trace of length 60.7 s into 10 segments, of which 10 were usable.
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/05_segment_CCFs_symm_ch1_ch2_br.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_Wohland_SD: Calculate correlation functions uncertainty using Wohland method.
+(Called by get_correlation_uncertainty)
+2023-09-24, 10:38:13
+6 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: 6.073905288276442
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+  
+Used 10 segments for uncertainty estimation.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_correlation_uncertainty: Calculate correlation function and uncertainty.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:38:13
+7 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+default_uncertainty_method (whether to try Wohland method SD calculation or directly use bootstrap): Wohland
+minimum_window_length (shortest allowed window length) [s]: []
+n_bootstrap_reps (number of bootstrap replicates to perform) 10
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: None, None
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Results written to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/06_CCF_symm_ch1_ch2_br.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_trace_time_scale)
+2023-09-24, 10:38:14
+7 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184740
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:14
+7 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184740
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:14
+7 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184740
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_trace_time_scale)
+2023-09-24, 10:38:15
+7 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 20000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 20971.564857824287, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 1.9505423663990175e-05
+Second correlation channel: 1.9505423663990175e-05
+
+Calculated as auto-correlation function.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_trace_time_scale: Automatically estimate a reasonable time trace bin width from data.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:38:15
+7 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+min_avg_counts (criterion 1: minimum average counts per bin): 10.0
+min_bin_width (criterion 2: minimum absolute bin width) [s]: 0.0001
+use_tau_diff (whether to use diffusion time estimate as criterion 3): True
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+
+Used short diffusion time from 2-component fit as criterion 3.
+
+Fit results:
+N: 16.057920720538895
+Diffusion times [s]: 0.00258310752360269, 0.002583108664787526
+Fractions: 0.509756051812235, 0.49024394818776496
+Offset: 0.006973928623615709
+
+1. time_for_min_avg_counts [ns]: 512678.3334973447
+2. min_bin_width [ns]: 100000.0
+3. tau_diff [ns]: 2583107.52360269
+
+Settled for time_trace_sampling [ns]: 2583107.52360269
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_trace_time_scale)
+2023-09-24, 10:38:15
+7 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1380825
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:15
+7 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1380825
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:15
+7 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1380825
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_trace_time_scale)
+2023-09-24, 10:38:16
+7 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 20000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 20971.564857824287, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 2.2733771827766796e-05
+Second correlation channel: 2.2733771827766796e-05
+
+Calculated as auto-correlation function.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_trace_time_scale: Automatically estimate a reasonable time trace bin width from data.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:38:16
+7 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+min_avg_counts (criterion 1: minimum average counts per bin): 10.0
+min_bin_width (criterion 2: minimum absolute bin width) [s]: 0.0001
+use_tau_diff (whether to use diffusion time estimate as criterion 3): True
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+
+Used short diffusion time from 2-component fit as criterion 3.
+
+Fit results:
+N: 12.407623638488257
+Diffusion times [s]: 0.002583738248885359, 0.0025837389172341345
+Fractions: 0.5113464884377612, 0.4886535115622388
+Offset: 0.006905884658133809
+
+1. time_for_min_avg_counts [ns]: 439875.0955607294
+2. min_bin_width [ns]: 100000.0
+3. tau_diff [ns]: 2583738.2488853587
+
+Settled for time_trace_sampling [ns]: 2583738.2488853587
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_time_trace)
+2023-09-24, 10:38:16
+7 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184740
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_time_trace: Bin photons into time trace, applying filters.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:38:17
+8 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+time_trace_sampling (time trace bin width) [s]: 0.0025834228669956087
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Split 60.7 s long acquisition into 23511 bins with an average of 50.39054059801795 counts per bin.
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/07_Trace_ch1_br.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_time_trace)
+2023-09-24, 10:38:17
+8 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1380825
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_time_trace: Bin photons into time trace, applying filters.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:38:18
+9 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+time_trace_sampling (time trace bin width) [s]: 0.0025834228669956087
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Split 60.7 s long acquisition into 23511 bins with an average of 58.730849389647396 counts per bin.
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/08_Trace_ch2_br.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by polynomial_undrifting_rss)
+2023-09-24, 10:38:33
+9 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184975
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+polynomial_undrifting_rss: Fit time trace with a polynomial model to describe bleaching/drift trend, and correct it.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:38:34
+10 output files generated so far.
+
+Parameters used:
+time_trace: pre-binned photon time trace of length 23511 and an average of 50.39054059801795 counts per bin
+time_trace_bin_centers: bin centers [ns] for time trace, binwidth is 2583422.866995609 ns.
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+undrift_order (polynomial fit order used to describe the beaching/drift trend): 7
+-> Auto-tuned undrift fit order based on residual sum of squares.
+max_undrift_order (in case of auto-tuning of undrift-order, what was the maximum allowed order): 10
+update_undrift_weights (whether to write the results of undrifting into the photon weights for further processing): True
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Corrected 1184975 photons with bleaching/drift trend model model b(t[ns]):  
+b(t[ns]) = 49.3662427036778 + (-9.45233381869774e-10)*t^1 + (3.0311820422831504e-19)*t^2 + (-3.1959138710947674e-29)*t^3 + (1.5458942065176375e-39)*t^4 + (-3.759034591466366e-50)*t^5 + (4.4672227513592464e-61)*t^6 + (-2.0669460325040345e-72)*t^7
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/09_Trace_ch1_undrift_fit.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by polynomial_undrifting_rss)
+2023-09-24, 10:38:50
+10 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1381191
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+polynomial_undrifting_rss: Fit time trace with a polynomial model to describe bleaching/drift trend, and correct it.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:38:51
+11 output files generated so far.
+
+Parameters used:
+time_trace: pre-binned photon time trace of length 23511 and an average of 58.730849389647396 counts per bin
+time_trace_bin_centers: bin centers [ns] for time trace, binwidth is 2583422.866995609 ns.
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+undrift_order (polynomial fit order used to describe the beaching/drift trend): 7
+-> Auto-tuned undrift fit order based on residual sum of squares.
+max_undrift_order (in case of auto-tuning of undrift-order, what was the maximum allowed order): 10
+update_undrift_weights (whether to write the results of undrifting into the photon weights for further processing): True
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Corrected 1381191 photons with bleaching/drift trend model model b(t[ns]):  
+b(t[ns]) = 59.67535506752113 + (-2.854956320675933e-09)*t^1 + (7.19989583118554e-19)*t^2 + (-6.991139494896748e-29)*t^3 + (3.244208705257007e-39)*t^4 + (-7.714699760692849e-50)*t^5 + (9.075511748309286e-61)*t^6 + (-4.1901109023551687e-72)*t^7
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/10_Trace_ch2_undrift_fit.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:51
+11 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184740
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:51
+11 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1380825
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_correlation_uncertainty)
+2023-09-24, 10:38:53
+11 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 1146.8257341286708, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 1.989393701047704e-05
+Second correlation channel: 2.4075974427255802e-05
+
+Calculated as two-channel cross-correlation function with assumption of time symmetry.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:53
+11 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 121006
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:38:54
+11 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 141258
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_segment_ccs)
+2023-09-24, 10:38:54
+11 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 1146.8257341286708, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 2.015177491867715e-05
+Second correlation channel: 2.444017466793286e-05
+
+Calculated as two-channel cross-correlation function with assumption of time symmetry.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_segment_ccs: Calculate correlation functions with filters for evenly spaces time segments of the measurement.
+(Called by get_Wohland_SD)
+2023-09-24, 10:38:58
+12 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: 6.073905288276442
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Split time trace of length 60.7 s into 10 segments, of which 10 were usable.
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/11_segment_CCFs_symm_ch1_ch2_br_dt.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_Wohland_SD: Calculate correlation functions uncertainty using Wohland method.
+(Called by get_correlation_uncertainty)
+2023-09-24, 10:38:58
+12 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: 6.073905288276442
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+  
+Used 10 segments for uncertainty estimation.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_correlation_uncertainty: Calculate correlation function and uncertainty.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:38:58
+13 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+default_uncertainty_method (whether to try Wohland method SD calculation or directly use bootstrap): Wohland
+minimum_window_length (shortest allowed window length) [s]: []
+n_bootstrap_reps (number of bootstrap replicates to perform) 10
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: None, None
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Results written to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/12_CCF_symm_ch1_ch2_br_dt.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:39:00
+13 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 121006
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:39:00
+13 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 141258
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_segment_ccs)
+2023-09-24, 10:39:00
+13 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 100000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 104858.06429032146, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 2.015177491867715e-05
+Second correlation channel: 2.444017466793286e-05
+
+Calculated as two-channel cross-correlation function with assumption of time symmetry.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_segment_ccs: Calculate correlation functions with filters for evenly spaces time segments of the measurement.
+(Called by run_mse_filter)
+2023-09-24, 10:39:04
+14 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: 6.073905288276442
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 100000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+Split time trace of length 60.7 s into 10 segments, of which 10 were usable.
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/13_segment_CCFs_symm_ch1_ch2_br_dt.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+cc_mse_filter_get_mse: Iteratively compare correlation functions to flag potential outliers through mean-square error statistics.
+(Called by run_mse_filter)
+2023-09-24, 10:39:04
+14 output files generated so far.
+
+Parameters used:
+  segment_ccs: Set of 10 correlation functions to compare, each containing 80 data points
+  ignore_amplitude_fluctuations (whether to linearly scale data to emphasise correlation function shape anomalies over amplitude fluctuations): True
+  
+  Found mean-square error values varying over a factor of 4.599999904632568. 
+  
+
+
+
+---------------------------------------------
+---------------------------------------------
+run_mse_filter: Segment photon stream into time windows, correlate them, and remove outliers with anomalous correlation function.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:39:04
+15 output files generated so far.
+
+Parameters_used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: Automatically chosen as 6.073905288276442
+mse_fold_threshold (mean-square error fold-change threshold for discarding segments): 2.5
+ignore_amplitude_fluctuations (whether to linearly scale data to emphasise correlation function shape anomalies over amplitude fluctuations): True
+update_macro_times (whether to update the macro time labled to close gaps in the photon stream created by discarding burst photons): True
+update_weights (whether to label the burst photons as photons to exclude from processed by setting their weights to 0): True
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 100000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+
+Out of 3814275 photons, 1450709 were discarded.
+
+  Split data into 10 segments, of which 10 were worth looking at, and 6 were kept in the end.
+  Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/14_anom_CCF_rem_symm_ch1_ch2_br_dt.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:39:05
+15 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 733220
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:39:05
+15 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 852246
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_correlation_uncertainty)
+2023-09-24, 10:39:06
+15 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 1146.8257341286708, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 1.98810502965087e-05
+Second correlation channel: 2.4068479946600492e-05
+
+Calculated as two-channel cross-correlation function with assumption of time symmetry.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:39:06
+15 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 107965
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:39:06
+15 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 126046
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_segment_ccs)
+2023-09-24, 10:39:06
+15 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 1146.8257341286708, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 2.000462398163225e-05
+Second correlation channel: 2.4239537234584764e-05
+
+Calculated as two-channel cross-correlation function with assumption of time symmetry.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_segment_ccs: Calculate correlation functions with filters for evenly spaces time segments of the measurement.
+(Called by get_Wohland_SD)
+2023-09-24, 10:39:10
+16 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: 5.466520801354007
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Split time trace of length 60.7 s into 12 segments, of which 8 were usable.
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/15_segment_CCFs_symm_ch1_ch2_br_dt_ar.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_Wohland_SD: Calculate correlation functions uncertainty using Wohland method.
+(Called by get_correlation_uncertainty)
+2023-09-24, 10:39:10
+16 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: 5.466520801354006
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+  
+Used 8 segments for uncertainty estimation.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_correlation_uncertainty: Calculate correlation function and uncertainty.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:39:11
+17 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+default_uncertainty_method (whether to try Wohland method SD calculation or directly use bootstrap): Wohland
+minimum_window_length (shortest allowed window length) [s]: []
+n_bootstrap_reps (number of bootstrap replicates to perform) 10
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: None, None
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Results written to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/16_CCF_symm_ch1_ch2_br_dt_ar.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_tcspc_histogram)
+2023-09-24, 10:39:11
+17 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 733220
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_tcspc_histogram: Calculate a TCSPC histogram.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:39:12
+18 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))  
+micro_times (time tags to histogram): from loaded TTTR retrieved  733220 photon time tags, of which 98.81564127027018 % were ultimately used.
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Calculated TCSPC histogram:
+has 2915 bins at 10.0 ps resolution
+contains 724536.044921875 photons
+ranges over 31.219999875251034 ns
+
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/17_TCSPC_ch1_br_dt_ar.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_tcspc_histogram)
+2023-09-24, 10:39:12
+18 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 733220
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_tcspc_histogram: Calculate a TCSPC histogram.
+(Called by get_background_tail_fit)
+2023-09-24, 10:39:12
+19 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))  
+micro_times (time tags to histogram): from loaded TTTR retrieved  733220 photon time tags, of which 98.81564127027018 % were ultimately used.
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Calculated TCSPC histogram:
+has 2915 bins at 10.0 ps resolution
+contains 724536.044921875 photons
+ranges over 31.219999875251034 ns
+
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/18_TCSPC_ch1_br_dt_ar.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_background_tail_fit: Fit an exponential decay to the tail of a TCSPC histogram to determine the flat background level.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:39:12
+20 output files generated so far.
+
+Parameters used:
+  channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+  irf_peak_center (as reference point for the amplitude) [micro time channels]: 3296
+  fit_start (left edge of time window to include in fit) [micro time channels]: 3497
+  ext_indices specified: False
+  use_ext_weights (use of weights for FLCS etc.): False
+  use_drift_correction (use of weights for bleaching/drift correction etc.): True
+  use_burst_removal (removal of photons assigned as burst photons): True
+  use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+  Included 724536.044921875 photons in fit.
+  Fitted the following parameters (reduced chi-square: 0.9461257677605184):
+  y_0 (laser-independent background) [counts per micro time channel]: 1.2620707488889917
+  exp_tau (1/e decay time of the exponential) [TCSPC time channels]: 268.00897390967793
+  amp (exponential decay amplitude) [counts per micro time channel]: 2897.5888818672615
+  
+  Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/19_Tail_fit1_br_dt_ar.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_tcspc_histogram)
+2023-09-24, 10:39:12
+20 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 852246
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_tcspc_histogram: Calculate a TCSPC histogram.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:39:13
+21 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))  
+micro_times (time tags to histogram): from loaded TTTR retrieved  852246 photon time tags, of which 102.92101533220747 % were ultimately used.
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Calculated TCSPC histogram:
+has 2918 bins at 10.0 ps resolution
+contains 877140.236328125 photons
+ranges over 31.23999987517112 ns
+
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/20_TCSPC_ch2_br_dt_ar.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_tcspc_histogram)
+2023-09-24, 10:39:13
+21 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): False
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 852246
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_tcspc_histogram: Calculate a TCSPC histogram.
+(Called by get_background_tail_fit)
+2023-09-24, 10:39:13
+22 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))  
+micro_times (time tags to histogram): from loaded TTTR retrieved  852246 photon time tags, of which 102.92101533220747 % were ultimately used.
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Calculated TCSPC histogram:
+has 2918 bins at 10.0 ps resolution
+contains 877140.236328125 photons
+ranges over 31.23999987517112 ns
+
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/21_TCSPC_ch2_br_dt_ar.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_background_tail_fit: Fit an exponential decay to the tail of a TCSPC histogram to determine the flat background level.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:39:14
+23 output files generated so far.
+
+Parameters used:
+  channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+  irf_peak_center (as reference point for the amplitude) [micro time channels]: 3302
+  fit_start (left edge of time window to include in fit) [micro time channels]: 3503
+  ext_indices specified: False
+  use_ext_weights (use of weights for FLCS etc.): False
+  use_drift_correction (use of weights for bleaching/drift correction etc.): True
+  use_burst_removal (removal of photons assigned as burst photons): True
+  use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+  Included 877140.236328125 photons in fit.
+  Fitted the following parameters (reduced chi-square: 0.9609838512373067):
+  y_0 (laser-independent background) [counts per micro time channel]: 1.3831739481976735
+  exp_tau (1/e decay time of the exponential) [TCSPC time channels]: 264.9927679702544
+  amp (exponential decay amplitude) [counts per micro time channel]: 3454.6767709740025
+  
+  Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/22_Tail_fit2_br_dt_ar.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_flcs_background_filter)
+2023-09-24, 10:39:14
+23 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): True
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1184975
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_flcs_background_filter: Use a previously determined (flat) background level to determine FLCS/fFCS filters for background suppression.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:39:16
+24 output files generated so far.
+
+Parameters used:
+  tcspc_x (TCSPC bin indices) and tcspc_y (full TCSPC histogram corresponding to those bins): 2915 bins, among those 0 empty bins, 724536.044921875 photons
+  flat_background (flat background level) [counts per TCSPC bin]: 1.2620707488889917
+  channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+  handle_outside (what to do with photons outside in bins tcspc_x: 'zero' (discard photons outside tcspc_x)
+  update_weights (whether to write updated weights to property in addition to returnig): {update_weights}
+  ext_indices specified: {ext_indices.shape[0] > 0}
+  
+  Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/23_FLCS_bg_corr_filters.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by get_flcs_background_filter)
+2023-09-24, 10:39:16
+24 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): False
+use_flcs_bg_corr (use of FLCS-based background subtraction): True
+use_burst_removal (removal of photons assigned as burst photons): False
+use_mse_filter (removal of photons in segments with anomalous correlation function): False
+
+overall number of photons selected: 1381191
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_flcs_background_filter: Use a previously determined (flat) background level to determine FLCS/fFCS filters for background suppression.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:39:18
+25 output files generated so far.
+
+Parameters used:
+  tcspc_x (TCSPC bin indices) and tcspc_y (full TCSPC histogram corresponding to those bins): 2918 bins, among those 0 empty bins, 877140.236328125 photons
+  flat_background (flat background level) [counts per TCSPC bin]: 1.3831739481976735
+  channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+  handle_outside (what to do with photons outside in bins tcspc_x: 'zero' (discard photons outside tcspc_x)
+  update_weights (whether to write updated weights to property in addition to returnig): {update_weights}
+  ext_indices specified: {ext_indices.shape[0] > 0}
+  
+  Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/24_FLCS_bg_corr_filters.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:39:18
+25 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 733220
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:39:18
+25 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 852246
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_correlation_uncertainty)
+2023-09-24, 10:39:19
+25 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: False
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 1146.8257341286708, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 1.978069615920445e-05
+Second correlation channel: 2.395852724205027e-05
+
+Calculated as two-channel cross-correlation function with assumption of time symmetry.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:39:19
+25 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 107965
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+select_photons: Get photons for processing and applying corrections.
+(Called by correlation_apply_filters)
+2023-09-24, 10:39:19
+25 output files generated so far.
+
+Parameters used:
+channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+overall number of photons selected: 126046
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+correlation_apply_filters: Calculate correlation function applying various filters
+(Called by get_segment_ccs)
+2023-09-24, 10:39:19
+25 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+ext_indices specified: True
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+-> Actual shortest and longest lag times calculated [ns]: 1146.8257341286708, 944897529.5476477.
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Average count rates (considering corrections and weights) [GHz]:
+First correlation channel: 1.9904534941672947e-05
+Second correlation channel: 2.4117696318037602e-05
+
+Calculated as two-channel cross-correlation function with assumption of time symmetry.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_segment_ccs: Calculate correlation functions with filters for evenly spaces time segments of the measurement.
+(Called by get_Wohland_SD)
+2023-09-24, 10:39:23
+26 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: 5.466520801354007
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Split time trace of length 60.7 s into 12 segments, of which 8 were usable.
+Wrote results to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/25_segment_CCFs_symm_ch1_ch2_br_dt_ar_bg.csv/png
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_Wohland_SD: Calculate correlation functions uncertainty using Wohland method.
+(Called by get_correlation_uncertainty)
+2023-09-24, 10:39:23
+26 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+minimum_window_length (shortest allowed window length) [s]: 5.466520801354006
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: 1000.0, 1000000000.0
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+  
+Used 8 segments for uncertainty estimation.
+
+
+
+
+---------------------------------------------
+---------------------------------------------
+get_correlation_uncertainty: Calculate correlation function and uncertainty.
+(Called by 02_standard_pipeline.ipynb)
+2023-09-24, 10:39:23
+27 output files generated so far.
+
+Parameters used:
+channels_spec_1, channels_spec_2 ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): ((1,), ((0.5,), (1,))), ((2,), ((0.5,), (1,)))
+default_uncertainty_method (whether to try Wohland method SD calculation or directly use bootstrap): Wohland
+minimum_window_length (shortest allowed window length) [s]: []
+n_bootstrap_reps (number of bootstrap replicates to perform) 10
+tau_min, tau_max (lower and upper bounds of correlation time) [ns]: None, None
+use_ext_weights (use of weights for FLCS etc.): False
+use_drift_correction (use of weights for bleaching/drift correction etc.): True
+use_flcs_bg_corr (use of FLCS-based background subtraction): True
+use_burst_removal (removal of photons assigned as burst photons): True
+use_mse_filter (removal of photons in segments with anomalous correlation function): True
+
+Results written to /fs/gpfs41/lv02/fileset02/pool/pool-schwille-spt/_Software/FCS_cleaner_dev/FCS_Fixer/test_data/4ch_setup/20230924_1037_membr_assoc_prot_A655/26_CCF_symm_ch1_ch2_br_dt_ar_bg.csv/png

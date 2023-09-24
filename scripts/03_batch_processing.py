@@ -12,7 +12,7 @@ This script basically does the same thing as 02_standard_pipeline.ipynb, but is 
 to auto-detect all .ptu files in one or multiple source directories, and automatically 
 process all of them for all channel combination present in the respective file.
 
-Currently all FCSArtifactFixer methods are used with default settings. Compare the
+Currently all FCS_Fixer methods are used with default settings. Compare the
 function calls to those in the Jupyter Notebook to figure out which keyword arguments
 you can use to adapt the script to your data, if the default parameters do not work well.
 '''
@@ -23,13 +23,13 @@ import os
 import sys
 import glob
 
-# For localizing FCSArtifactFixer
+# For localizing FCS_Fixer
 repo_dir = os.path.abspath('..')
 
 # For data processing
 sys.path.insert(0, repo_dir)
 import tttrlib
-from functions import FCSArtifactFixer
+from functions import FCS_Fixer
 import numpy as np
 
 # Other
@@ -85,7 +85,7 @@ for i_file, in_path in enumerate(in_paths):
         out_name_common = os.path.splitext(_file_names[i_file])[0]
         out_path = os.path.join(_dir_names[i_file], datetime.datetime.now().strftime("%Y%m%d_%H%M") +'_'+ out_name_common)
     
-        fixer = FCSArtifactFixer.FCSArtifactFixer(photon_data = photon_data, 
+        fixer = FCS_Fixer.FCS_Fixer(photon_data = photon_data, 
                                                     out_path = out_path,
                                                     tau_min = tau_min,
                                                     tau_max = tau_max,
@@ -185,7 +185,7 @@ for i_file, in_path in enumerate(in_paths):
                                                                             calling_function = script_name)
                     
                     # Run drift/bleaching correction
-                    _ = fixer.polynomial_detrending_rss(time_trace_counts, 
+                    _ = fixer.polynomial_undrifting_rss(time_trace_counts, 
                                                           time_trace_t, 
                                                           channels_spec_1,
                                                           use_burst_removal = use_burst_removal,
@@ -204,7 +204,7 @@ for i_file, in_path in enumerate(in_paths):
                                                                                 calling_function = script_name)
                         
                         # Run drift/bleaching correction
-                        _ = fixer.polynomial_detrending_rss(time_trace_counts, 
+                        _ = fixer.polynomial_undrifting_rss(time_trace_counts, 
                                                               time_trace_t, 
                                                               channels_spec_2,
                                                               use_burst_removal = use_burst_removal,
@@ -225,7 +225,7 @@ for i_file, in_path in enumerate(in_paths):
                 if use_mse_filter:
                     
                     # Running this filter is a single function call, whether you have one or two channels
-                    _ = fixer.discard_anomalous_segments(channels_spec_1, 
+                    _ = fixer.run_mse_filter(channels_spec_1, 
                                                            channels_spec_2,
                                                            use_drift_correction = use_bleaching_correction,
                                                            use_burst_removal = use_burst_removal,
