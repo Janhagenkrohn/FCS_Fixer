@@ -1,6 +1,6 @@
 # FCS_Fixer
 
-FCS_Fixer is an all-Python module meant to make data analysis for Fluorescence Correlation Spectroscopy (FCS) data acquired in time-tagged, time-resolved mode, easier. 
+FCS_Fixer is a Python module meant to make data analysis for Fluorescence Correlation Spectroscopy (FCS) data acquired in time-tagged, time-resolved mode, easier. 
 
 In FCS experiments, one often deals not only with the desired signal, but also various artifacts, some sample-related, some instrument-related. Such artifacts include (but are not limited to):
 1. High-intensity "Bursts" from bright particles moving through the detection volume
@@ -9,9 +9,9 @@ In FCS experiments, one often deals not only with the desired signal, but also v
 4. Detector afterpulsing
 
 FCS_Fixer attempts to fix the mentioned artifacts in a largely automated manner. "Automation" here refers to the fact that the user only needs to...
-- Specify which data to use
-- Define which filters to use (where the user can choose freely the order in which to chain multiple of them)
-- Supply some metaparameters to the filters that are used for statistical criteria by which to chose the actual filter parameters (default values that in our hands work well for many settings are set in the background)
+1. Specify which data to use
+2. Define which filters to use (where the user can choose freely the order in which to chain multiple of them)
+3. Supply some metaparameters to the filters that are used for statistical criteria by which to chose the actual filter parameters (default values that in our hands work well for many settings are set in the background)
 
 However, the module also leaves plenty of backdoors to access the parameters of some filter functions on a more direct level, or even combine the built-in filters and logic with entirely custom weighting, time gating, or photon selection functions.
 
@@ -46,20 +46,28 @@ For now, let's look at how to set up the correct Python environment. Use the Ana
 
 ### Create environment
 In the command shell, run:
+
 `conda create --name tttr python=3.7.11` 
+
 `tttr` is just the environment name we use, you may replace that with whatever you like.
 
 ### Install required packages
  Activate the environment and install some common packages, nothing fancy at this point:
+ 
 `conda activate tttr`
+
 `conda install numpy scipy matplotlib pandas`
+
 `pip install jupyter lmfit uncertainties`
 
 Additionally, you'll want to install Spyder or another IDE:
+
 `conda install spyder`
 
 Installing tttrlib is a little more error-prone. Be careful about the version:
+
 `conda install -c "tpeulen/label/old" tttrlib=0.0.19`
+
 Check the tttrlib installation guidelines if this command does not work for you.
 
 ### Getting FCS_Fixer itself
@@ -68,12 +76,16 @@ Simply clone the GitHub repo into some local directory on your machine, and you'
 Typing `jupyter notebook` into the shell should open Jupyter Notebook inside a browser. If not, look into information on Jupyter Notebook errors on the web, we cannot predict here what errors may cause this.
 
 One known issue Jupyter Notebook we'd like to mention here as we encountered it ourselves is that sometimes, depending on the exact history of how you handle your conda environments, Jupyter Notebook ends up trying to run a different Python version than what the environment. In that case, fix the issue by running these two commands while in the `tttr` environment:
+
 `pip install ipykernel`
+
 `python -m ipykernel install --user`
 
 
 ### Development
 The module is built around tttrlib (https://github.com/Fluorescence-Tools/tttrlib), and some functions also use code snippets taken from tttrlib application examples.
+
 FCS_Fixer core developer and contact for inquiries: Jan-Hagen Krohn (krohn@biochem.mpg.de)
+
 Assistance in pipeline development and debugging: Béla Frohn, Lise Isnel, Yusuf Qutbuddin
 
