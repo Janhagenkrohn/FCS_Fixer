@@ -7058,12 +7058,12 @@ class FCS_Fixer():
         if use_mse_filter:
             
             # Running this filter is a single function call, whether you have one or two channels
-            _ = self.discard_anomalous_segments(channels_spec_norm_ch1, 
-                                                channels_spec_norm_ch2,
-                                                use_drift_correction = use_drift_correction,
-                                                use_burst_removal = use_burst_removal,
-                                                calling_function = 'run_standard_pipeline',
-                                                suppress_logging = suppress_logging)
+            _ = self.run_mse_filter(channels_spec_norm_ch1, 
+                                    channels_spec_norm_ch2,
+                                    use_drift_correction = use_drift_correction,
+                                    use_burst_removal = use_burst_removal,
+                                    calling_function = 'run_standard_pipeline',
+                                    suppress_logging = suppress_logging)
             
             # Correlate with filters up to this point applied
             _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
