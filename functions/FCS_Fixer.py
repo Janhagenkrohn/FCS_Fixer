@@ -6509,7 +6509,7 @@ class FCS_Fixer():
         # Write results files, if desired
         if self._write_results:
             
-            tcspc_x_crop_ns = tail_fit.x * self._micro_time_corr
+            tcspc_x_crop_ns = tail_fit.x * self._micro_time_resolution
             
             out_path_full = os.path.join(self._out_path, ('0' + str(self._out_file_counter)) if self._out_file_counter < 10 else str(self._out_file_counter))
             self._out_file_counter += 1
