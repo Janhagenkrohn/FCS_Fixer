@@ -3026,7 +3026,7 @@ class FCS_Fixer():
         else: # There is some gating used
             if len(micro_time_cutoffs) == 1: 
                 # Single cutoff
-                gates = np.array([0, micro_time_cutoffs, 1])
+                gates = np.array([0, micro_time_cutoffs[0], 1])
                         
             else: 
                 # Muliple cutoffs

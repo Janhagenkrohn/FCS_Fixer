@@ -282,7 +282,7 @@ for i_file, in_path in enumerate(in_paths):
                         
                         # Find suitable range for tail fitting, and perform tail fit
                         peak_position = np.argmax(tcspc_y)
-                        fit_start = np.uint64(peak_position + np.ceil(2E9 / fixer.micro_time_resolution))
+                        fit_start = np.uint64(peak_position + np.ceil(2E-9 / fixer.micro_time_resolution))
                         flat_background, _ = fixer.get_background_tail_fit(channels_spec_2, 
                                                                              peak_position, 
                                                                              fit_start,
