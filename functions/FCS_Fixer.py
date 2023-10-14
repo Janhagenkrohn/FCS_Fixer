@@ -63,6 +63,24 @@ def isiterable(object_to_check):
     return type(object_to_check) in [list, tuple, np.ndarray]
 
 
+def isfloat(object_to_check):
+    '''
+    Just a shorthand to check if the object in question is one out of a few 
+    float types, which we use in other functions.
+
+    Parameters
+    ----------
+    object_to_check : 
+        Some object whose type we want to check.
+
+    Returns
+    -------
+    Bool
+        True if the object is an allowed float type, else False.
+
+    '''
+    return type(object_to_check) in [float, np.float16, np.float32, np.float64]
+
 def lin_scaling_of_data(data_raw,
                         data_ref):
     '''
@@ -1263,6 +1281,109 @@ class FCS_Fixer():
     # the contect of this class, but on the other hand have no use for any 
     # parameters accessed via self, so I might as well make them in principle 
     # accessible independent of class instance creation.
+    
+    @staticmethod
+    def build_channels_spec(channels_indices,
+                            micro_time_gates = None):
+        '''
+        
+        Construct a channels_spec tuple from more intuitive input.
+
+        Parameters
+        ----------
+        channels_indices:
+            int or iterable of int. Routing channel (spectral/polarization/...) 
+            indices to use.
+        micro_time_gates:
+            OPTIONAL interable of float. Specifies micro time gating to apply, 
+            as positive gates of "use these photons and not the others".
+            You can concatenate as many gates as you want. If left empty, no 
+            gating is applied and all photons are used.
+            Float must all be >= 0 and <= 1, specifying RELATIVE cutoffs along 
+            the micro time cycle. They must come in ascending order as:
+            [first_start, first_stop, second_start, second_stop, ...]. Therefore, 
+            the number of elements in micro_time_gates must be an integer 
+            multiple of 2. It is NOT currently possible to define distinct micro 
+            time gates for different routing channels.
+        
+        Returns
+        ----------
+        channels_spec in nested tuple format - see docstring of check_channels_spec for details.
+        
+        
+        '''
+        
+        # Input check
+        if not isint(channels_indices) or isiterable(channels_indices):
+            raise ValueError('Invalid input for channels_indices: Must be int or list of int')
+            
+        elif isiterable(channels_indices) and not isint(channels_indices[0]):
+            raise ValueError('Invalid input for channels_indices: Must be int or list of int')
+        
+        if micro_time_gates == None:
+            # No micro time gating
+            # We simply hand the channel index/channels indices into 
+            # check_channels_spec() to construct a standard channels_spec
+            channels_spec = FCS_Fixer.check_channels_spec(channels_indices)
+            
+        elif isiterable(micro_time_gates):
+            # Looks like the user was trying to specify a micro time gating...
+            
+            if not (np.all([isfloat(element) for element in micro_time_gates[0]]) and \
+                    np.all(micro_time_gates >= 0.) and \
+                    np.all(micro_time_gates <= 1.) and \
+                    np.all(np.diff(micro_time_gates >= 0.)) and \
+                    (len(micro_time_gates) > 0 and len(micro_time_gates) % 2 == 0)):
+                # ... but did something wrong.
+                raise ValueError('Invalid input for micro_time_gates. Must be None, or an iterable of floats enumerating [first_start, first_stop, second_start, second_stop, ...]')
+            
+            else:
+                # ... which looks good.
+                # Convert the micro time gate specifier(s) into something we can use
+                micro_time_cutoffs = []
+                micro_time_gates_to_use = []
+                last_stop = 0.
+                gate_counter = 0
+                
+                for i_gate in range(0, len(micro_time_gates), 2):
+                    start = micro_time_gates[i_gate]
+                    stop = micro_time_gates[i_gate+1]
+
+                    if start > last_stop:
+                        # There was a gap to skip, we need a new cutoff
+                        micro_time_cutoffs.append(start)
+                        micro_time_gates_to_use.append(gate_counter + 1)
+                        gate_counter += 2
+
+                    else:
+                        # No gap to skip - we do not need to define a new cutoff
+                        micro_time_gates_to_use.append(gate_counter)
+                        gate_counter += 1
+
+                    if stop < 1.:
+                        # We have a new stop cutoff
+                        micro_time_cutoffs.append(stop)
+                        last_stop = stop
+                        
+                    else:
+                        # We stop at 1, so there is no need to define a new cutoff
+                        pass
+                    
+                if len(micro_time_cutoffs) == 0:
+                    # Will happen if the user defined (0., 1.). In that case it's trivial after all.
+                    channels_spec = FCS_Fixer.check_channels_spec(channels_indices)
+
+                else:
+                    # We constructed something interesting, time to piece it together
+                    channels_spec = (tuple(channels_indices), (tuple(micro_time_cutoffs), tuple(micro_time_gates_to_use)))
+                    
+                
+        else:
+            raise ValueError('Invalid input for micro_time_gates. Must be None, or an iterable of floats enumerating [first_start, first_stop, second_start, second_stop, ...]')
+
+        return channels_spec
+    
+    
     
     @staticmethod
     def check_channels_spec(channels_spec):
