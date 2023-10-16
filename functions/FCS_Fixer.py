@@ -1314,25 +1314,25 @@ class FCS_Fixer():
         '''
         
         # Input check
-        if not isint(channels_indices) or isiterable(channels_indices):
+        if not isint(channels_indices) and not isiterable(channels_indices):
             raise ValueError('Invalid input for channels_indices: Must be int or list of int')
-            
-        elif isiterable(channels_indices) and not isint(channels_indices[0]):
+
+        elif isiterable(channels_indices) and not np.all([isint(element) for element in channels_indices]):
             raise ValueError('Invalid input for channels_indices: Must be int or list of int')
-        
+
         if micro_time_gates == None:
             # No micro time gating
             # We simply hand the channel index/channels indices into 
             # check_channels_spec() to construct a standard channels_spec
             channels_spec = FCS_Fixer.check_channels_spec(channels_indices)
-            
+
         elif isiterable(micro_time_gates):
             # Looks like the user was trying to specify a micro time gating...
-            
-            if not (np.all([isfloat(element) for element in micro_time_gates[0]]) and \
+
+            if not (np.all([isfloat(element) for element in micro_time_gates]) and \
                     np.all(micro_time_gates >= 0.) and \
                     np.all(micro_time_gates <= 1.) and \
-                    np.all(np.diff(micro_time_gates >= 0.)) and \
+                    np.all(np.diff(micro_time_gates) >= 0.) and \
                     (len(micro_time_gates) > 0 and len(micro_time_gates) % 2 == 0)):
                 # ... but did something wrong.
                 raise ValueError('Invalid input for micro_time_gates. Must be None, or an iterable of floats enumerating [first_start, first_stop, second_start, second_stop, ...]')
