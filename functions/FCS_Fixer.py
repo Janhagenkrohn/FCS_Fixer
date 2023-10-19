@@ -1466,7 +1466,7 @@ class FCS_Fixer():
                     # It's indeed a simple np.array of int and looks OK, wrap and return
                     return (tuple(channels_spec),((),(0,)))
 
-        elif type(channels_spec) == tuple:
+        elif isiterable(channels_spec):
             # It is a tuple, tihs is the complicated situation. Let's look closer...
             
             if isint(channels_spec[0]):
@@ -1485,15 +1485,15 @@ class FCS_Fixer():
                     # It's a simple tuple of int and looks OK, wrap and return
                     return (tuple(channels_spec),((),(0,)))
                 
-            if type(channels_spec[0]) == float:
+            if isfloat(channels_spec[0]):
                 # Probably gave a float where an int was intended
                 raise ValueError('''channels_spec[0] invalid. Found float where int was expected.''')
 
-            if type(channels_spec[0]) == tuple:
+            if iterable(channels_spec[0]):
                 # This looks like a nested tuple, continue checks with that in mind
                 
                 # Check channel indices - should be tuple of int
-                if np.any([type(element) == float for element in channels_spec[0]]):
+                if np.any([isfloat(element) for element in channels_spec[0]]):
                     # Float instead of int
                     raise ValueError('''channels_spec[0] invalid. Found float where int was expected. 
                                      Got: 
@@ -1509,7 +1509,7 @@ class FCS_Fixer():
                                      ''' + str(channels_spec))
 
                 # Check second half
-                if type(channels_spec[1]) != tuple:
+                if not isiterable(channels_spec[1]):
                     raise ValueError('''channels_spec[1] invalid. Found a tuple in tuple channels_spec[0], 
                                      which indicates that you tried to go with the nested tuple structure. 
                                      In that case, channels_spec[1] must be a nested tuple itself with structure: 
@@ -1518,11 +1518,11 @@ class FCS_Fixer():
                                      ''' + str(channels_spec))
 
                 else:
-                    # type(channels_spec[1]) == tuple, which makes sense, but are the inner tuples correct?
+                    # channels_spec[1]it iterable, which makes sense, but are the inner tuples correct?
                     
                     # Check first element for micro time cutoffs.
-                    if type(channels_spec[1][0]) != tuple or \
-                        np.any([(type(element) != float or element < 0 or element > 1) for element in channels_spec[1][0]]):
+                    if not isiterable(channels_spec[1][0]) or \
+                        np.any([(not isfloat(element) or element < 0 or element > 1) for element in channels_spec[1][0]]):
                         raise ValueError('''channels_spec[1][0] invalid. Found a tuple in tuple channels_spec[0], 
                                          which indicates that you tried to go with the nested tuple structure. 
                                          In that case, channels_spec[1][0] must be a tuple of floats >= 0 and <= 1 
@@ -1531,7 +1531,7 @@ class FCS_Fixer():
                                          ''' + str(channels_spec))
 
                     # Check second element for selection of window(s).
-                    if type(channels_spec[1][1]) != tuple or \
+                    if not isiterable(channels_spec[1][1]) or \
                         np.any([(not isint(element) or element > len(channels_spec[1][0])) for element in channels_spec[1][1]]):
                         raise ValueError('''channels_spec[1][1] invalid. Found a tuple in tuple channels_spec[0], 
                                          which indicates that you tried to go with the nested tuple structure. 
@@ -1542,8 +1542,8 @@ class FCS_Fixer():
                                          Got: 
                                          ''' + str(channels_spec))
                                          
-                # If we arrived here, it should be a valid nested tuple structure, report
-                return channels_spec
+                # If we arrived here, it should be a valid nested tuple structure, return normalizes structure
+                return (tuple(channels_spec[0]), (tuple(channels_spec[1][0]), tuple(channels_spec[1][1]))
                                          
             
     @staticmethod
