@@ -1489,7 +1489,7 @@ class FCS_Fixer():
                 # Probably gave a float where an int was intended
                 raise ValueError('''channels_spec[0] invalid. Found float where int was expected.''')
 
-            if iterable(channels_spec[0]):
+            if isiterable(channels_spec[0]):
                 # This looks like a nested tuple, continue checks with that in mind
                 
                 # Check channel indices - should be tuple of int
