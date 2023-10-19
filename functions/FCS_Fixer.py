@@ -1543,7 +1543,7 @@ class FCS_Fixer():
                                          ''' + str(channels_spec))
                                          
                 # If we arrived here, it should be a valid nested tuple structure, return normalizes structure
-                return (tuple(channels_spec[0]), (tuple(channels_spec[1][0]), tuple(channels_spec[1][1]))
+                return (tuple(channels_spec[0]), (tuple(channels_spec[1][0]), tuple(channels_spec[1][1])))
                                          
             
     @staticmethod
