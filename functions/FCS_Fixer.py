@@ -1329,6 +1329,9 @@ class FCS_Fixer():
         elif isiterable(micro_time_gates):
             # Looks like the user was trying to specify a micro time gating...
 
+            # Whatever type of iterable it was, we convert it to array to allow the following calculations
+            micro_time_gates = np.array(micro_time_gates)
+
             if not (np.all([isfloat(element) for element in micro_time_gates]) and \
                     np.all(micro_time_gates >= 0.) and \
                     np.all(micro_time_gates <= 1.) and \
