@@ -122,6 +122,7 @@ class Parallel_scheduler():
                  cross_corr_symm = False,
                  use_calibrated_AP_subtraction = False,
                  afterpulsing_params_path = '',
+                 list_of_channel_pairs = [],
                  use_burst_removal = False,
                  use_drift_correction = False,
                  use_mse_filter = False,
@@ -156,6 +157,12 @@ class Parallel_scheduler():
             OPTIONAL string/path with default '' (empty). Path to afterpulsing calibration
             file. Necessary if use_calibrated_AP_subtraction == True, otherwise 
             ignored.
+        list_of_channel_pairs :
+            OPTIONAL iterable of 2-element iterables of channels_spec tuples, with syntax 
+            as delivered by FCS_Fixer.get_channel_combinations(). Specifies which 
+            correlation operations to perform. If left empty, the software will perform all
+            possible auto- and cross-correlations between channels that have a somewhat 
+            reasonable number of photons in the raw data.
         use_burst_removal : 
             OPTIONAL bool with default False. Whether to use burst removal filter.
         use_drift_correction : 
@@ -177,6 +184,7 @@ class Parallel_scheduler():
         self.cross_corr_symm = cross_corr_symm
         self.use_calibrated_AP_subtraction = use_calibrated_AP_subtraction
         self.afterpulsing_params_path = afterpulsing_params_path
+        self.list_of_channel_pairs = list_of_channel_pairs
         self.use_burst_removal = use_burst_removal
         self.use_drift_correction = use_drift_correction
         self.use_mse_filter = use_mse_filter
@@ -193,6 +201,7 @@ class Parallel_scheduler():
                                            use_mse_filter,
                                            use_flcs_bg_corr,
                                            afterpulsing_params_path = '',
+                                           list_of_channel_pairs = [],
                                            cross_corr_symm = False,
                                            correlation_method = 'default',
                                            job_name = ''):
@@ -226,6 +235,12 @@ class Parallel_scheduler():
             OPTIONAL string/path with default '' (empty). Path to afterpulsing calibration
             file. Necessary if use_calibrated_AP_subtraction == True, otherwise 
             ignored.
+        list_of_channel_pairs :
+            OPTIONAL iterable of 2-element iterables of channels_spec tuples, with syntax 
+            as delivered by FCS_Fixer.get_channel_combinations(). Specifies which 
+            correlation operations to perform. If left empty, the software will perform all
+            possible auto- and cross-correlations between channels that have a somewhat 
+            reasonable number of photons in the raw data.
         cross_corr_symm : 
             OPTIONAL bool with default False. In case of cross-correlation function
             calculation, should we assume time symmetry? Doing so increases 
@@ -263,9 +278,10 @@ class Parallel_scheduler():
         fixer.update_params()
         
         
-        # Auto-detect all channels in the file and enumerate all combinations to correlate
-        list_of_channel_pairs = fixer.get_channel_combinations(min_photons = 1000)
-        
+        # Auto-detect all channels in the file and enumerate all combinations to correlate, if not specified
+        if list_of_channel_pairs == []:
+            list_of_channel_pairs = fixer.get_channel_combinations(min_photons = 1000)
+
         # Perform all correlations
         for channels_spec_1, channels_spec_2 in list_of_channel_pairs:
             
@@ -312,6 +328,7 @@ class Parallel_scheduler():
                                                 use_mse_filter = self.use_mse_filter,
                                                 use_flcs_bg_corr = self.use_flcs_bg_corr,
                                                 afterpulsing_params_path = self.afterpulsing_params_path,
+                                                list_of_channel_pairs = self.list_of_channel_pairs,
                                                 cross_corr_symm = self.cross_corr_symm,
                                                 correlation_method = self.correlation_method,
                                                 job_name = f'process_{process_id}')

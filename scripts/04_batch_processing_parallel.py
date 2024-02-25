@@ -50,6 +50,7 @@ tau_max = 1.0
 sampling = 6
 cross_corr_symm = True
 correlation_method = 'default'
+list_of_channel_pairs = [] # Empty list = auto-detect and use all options
 
 # How many parallel processes?
 process_count = 8
@@ -77,17 +78,18 @@ for dir_name in dir_names:
 in_paths=[os.path.join(_dir_names[i],file_name) for i, file_name in enumerate(_file_names)]
 
 scheduler = FCS_Fixer.Parallel_scheduler(in_paths,
-                                                 tau_min = tau_min,
-                                                 tau_max = tau_max,  
-                                                 sampling = sampling,
-                                                 correlation_method = correlation_method,
-                                                 cross_corr_symm = cross_corr_symm,
-                                                 use_calibrated_AP_subtraction = use_calibrated_AP_subtraction,
-                                                 afterpulsing_params_path = afterpulsing_params_path,
-                                                 use_burst_removal = use_burst_removal,
-                                                 use_drift_correction = use_bleaching_correction,
-                                                 use_mse_filter = use_mse_filter,
-                                                 use_flcs_bg_corr = use_flcs_bg_subtraction)
+                                         tau_min = tau_min,
+                                         tau_max = tau_max,  
+                                         sampling = sampling,
+                                         correlation_method = correlation_method,
+                                         cross_corr_symm = cross_corr_symm,
+                                         use_calibrated_AP_subtraction = use_calibrated_AP_subtraction,
+                                         afterpulsing_params_path = afterpulsing_params_path,
+                                         list_of_channel_pairs = list_of_channel_pairs,
+                                         use_burst_removal = use_burst_removal,
+                                         use_drift_correction = use_bleaching_correction,
+                                         use_mse_filter = use_mse_filter,
+                                         use_flcs_bg_corr = use_flcs_bg_subtraction)
 
 scheduler.run_parallel_processing(process_count)
 
