@@ -2889,7 +2889,179 @@ class FCS_Fixer():
 
         return lag_times[keep], cc[keep]
         
+    
+    def get_PCH(self,
+                channels_spec,
+                bin_time,
+                normalize = False,
+                ext_indices = np.array([]),
+                use_burst_removal = False,
+                use_mse_filter = False,
+                suppress_logging = False,
+                calling_function = ''
+                ):
+        '''
+        Calculates a photon counting histogram for a channel of interest,
+        including all the selection options in channels_spec, the option to externally
+        specify which photons to use and which not, burst removal and the MSE-based
+        removal of anomalous data segments. Note that PCH is not used with photon 
+        weighting-based filters, as these would lead to a broadening of the PCH 
+        and thus distortion of the parameters!
+                
+        Parameters
+        ----------
+        channels_spec: 
+            Channel configuration specifier for the correlation operation. 
+            See description in self.check_channels_spec() for details.
+        bin_time:
+            Float specifying the desired bin width in seconds.
+        normalize:
+            OPTIONAL Bool with default False, specifying whether or not to 
+            normalize the PCH.
+        ext_indices :
+            OPTIONAL np.array Externally specified indices of photons in the self.photon_data 
+            tttr object to use in correlation. Can be used in slicing 
+            data into a series of correlation fucntions, or to 
+            randomize stuff (bootstrap). Or the user can exploit it as a handle
+            to implement their own custom photon selection logic, obviously.
+        use_burst_removal :
+            OPTIONAL bool. Specifies whether or not to use the attributes 
+            self._macro_time_correction_burst_removal and self._weights_burst_removal to mask out 
+            photons labelled as burst photons
+        use_mse_filter :
+            OPTIONAL bool. Specifies whether or not to use the attributes 
+            self._weights_anomalous_segments and self._macro_times_correction_mse_filter
+            to mask out photons labelled as being in an anomalous time segment.
+        suppress_logging :
+            OPTIONAL bool. If the function called with suppress_logging == True, the call will 
+            not be registered in the log file even if the Class instance has been 
+            set to create a log file. The default is False.
+        calling_function : 
+            string, optional This is a handle specifically meant for logging 
+            which function had called this function. To make the code stack 
+            more understandable in the log.
+
+        Returns
+        -------
+        pch :
+            np.array containing counts (or probability mass depending on arg 
+            "normalize") of PCH. Corresponding a-axis is not explicitly
+            returned, it would be np.arange(0, pch.shape[0])
+
+        '''
         
+        # Unpack required channels information
+        channels_spec = self.check_channels_spec(channels_spec)
+        
+        # Get time trace - we do not really care about the time inforamtion in PCH,
+        # but the tt is an intermediate 
+        time_trace, _ = self.get_time_trace(channels_spec, 
+                                             time_trace_sampling = bin_time,
+                                             use_ext_weights = False,
+                                             ext_indices = ext_indices,
+                                             use_drift_correction = False,
+                                             use_flcs_bg_corr = False,
+                                             use_burst_removal = use_burst_removal,
+                                             use_mse_filter = use_mse_filter,
+                                             suppress_logging = suppress_logging,
+                                             calling_function = 'get_PCH')
+        
+        # Get actul PCH
+        pch, _ = np.histogram(time_trace,
+                              bins = np.arange(0, np.max(time_trace) + 1),
+                              density = normalize)
+        
+        return pch
+    
+    
+    def get_PCMH(self,
+                channels_spec,
+                spacing = np.sqrt(2),
+                normalize = False,
+                ext_indices = np.array([]),
+                use_burst_removal = False,
+                use_mse_filter = False,
+                suppress_logging = False,
+                calling_function = ''
+                ):
+        
+        channels_spec = self.check_channels_spec(channels_spec)
+        
+        # We use all bin widths starting at 1 us going up in factors of "spacing"
+        # until the last one where we get 10^5 bins out of the data (ignoring 
+        # possible loss due to MSE filter and whatnot)
+        next_bin_time = self.acquisition_time / 1E5
+        
+        bin_times = [1E-6]
+        next_bin_time = 1E-6 * spacing
+        while next_bin_time < next_bin_time:
+            bin_times.append(next_bin_time)
+            next_bin_time =* spacing
+        
+        # We get the last PCH with the widest bins first, as it defined the 
+        # pd.DF size we'll need (widest bins -> reaches the highest photon counts)
+        pch = self.get_PCH(channels_spec,
+                           bin_time = bin_times[-1],
+                           normalize = normalize,
+                           ext_indices = ext_indices,
+                           use_burst_removal = use_burst_removal,
+                           use_mse_filter = use_mse_filter,
+                           suppress_logging = suppress_logging,
+                           calling_function = 'get_PCMH'
+                           )
+        
+        pcmh = np.zeros((pch.shape[0], len(bin_times)))
+        pcmh[:,-1] = pch
+        
+        for i_bin_time, bin_time in enumerate(bin_times[:-1]):
+            pch = self.get_PCH(channels_spec,
+                                bin_time = bin_time,
+                                normalize = normalize,
+                                ext_indices = ext_indices,
+                                use_burst_removal = use_burst_removal,
+                                use_mse_filter = use_mse_filter,
+                                suppress_logging = suppress_logging,
+                                calling_function = 'get_PCMH'
+                                )
+            pcmh[0:pch.shape[0], i_bin_time] = pch
+        
+        
+        if self._write_results:
+            # Write results to csv and png output
+            out_path_full = os.path.join(self._out_path, ('0' + str(self._out_file_counter)) if self._out_file_counter < 10 else str(self._out_file_counter))
+            self._out_file_counter += 1
+            
+            out_path_full += '_PCMH' + ''.join([str(element) for element in channels_spec[0]])
+            # Update name according to applied corrections
+            out_path_full += ('_br' if use_burst_removal else '') + \
+                             ('_ar' if use_mse_filter else '')            
+
+        
+            out_table = pd.DataFrame(data = {str(bin_time): pcmh[:,i_bin_time] for i_bin_time, bin_time in enumerate(bin_times)})
+            
+            out_table.to_csv(out_path_full + '.csv', 
+                              index = False, 
+                              header = True)
+            
+        # Write to log, if desired
+        if self._write_log and not suppress_logging:
+            self.write_to_logfile(log_header = '''get_PCMH: Series of PCHs with different bin times.''',
+                                  log_message = f'''Parameters used:
+                                    channels_spec ((one_or_multiple_channels), ((PIE_gate_edges), (which_gates_to_use))): {channels_spec}
+                                    spacing : {spacing}
+                                      -> Bin times: [''' + ''.join([str(element) + ', ' for element in bin_times]) + f'''] s
+                                    ext_indices specified: {ext_indices.shape[0] > 0}
+                                    use_burst_removal (removal of photons assigned as burst photons): {use_burst_removal}
+                                    use_mse_filter (removal of photons in segments with anomalous correlation function): {use_mse_filter}
+                                    ''' + (f'''Results written to {out_path_full}.csv/png''') if self._write_results else '' + f'''
+                                    
+                                    Highest photon count encountered: {pcmh.shape[1]}
+                                    ''',
+                                    calling_function = calling_function)
+
+        return pcmh
+        
+    
         
     def select_photons(self,
                        channels_spec, 
