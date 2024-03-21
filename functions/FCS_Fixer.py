@@ -4323,7 +4323,7 @@ class FCS_Fixer():
             
             # Wrap stuff for file writing, and perform CSV export
             acr_col = np.zeros_like(lag_times)
-            acr_col[:2] = np.array([acr1, acr2]) * 1E9
+            acr_col[:3] = np.array([acr1, acr2, self._acquisition_time]) * 1E9
             out_table = pd.DataFrame(data = {'Lagtime[s]':lag_times * 1E-9, # from ns to s
                                              'Correlation': cc,
                                              'ACR[Hz]': acr_col,
@@ -7128,7 +7128,7 @@ class FCS_Fixer():
         Calculate a series of photon counting histograms with equidistant 
         logarithmic spacing of bin widths, starting at 1 us and ending at 
         at the highest bin width in the logarithmic spacing that yielded more 
-        than 10^5 independent bins.
+        than 1000 independent bins.
         See also "Photon Counting Multiple Histograms" as described in:
         Perroud, Huang, Zare ChemPhysChem 2005 DOI: 10.1002/cphc.200400547
 
@@ -7188,9 +7188,9 @@ class FCS_Fixer():
             raise ValueError('spacing must be greater 1!')
         
         # We use all bin widths starting at 1 us going up in factors of "spacing"
-        # until the last one where we get 10^5 bins out of the data (ignoring 
+        # until the last one where we get 1000 bins out of the data (ignoring 
         # possible loss due to MSE filter and whatnot)
-        max_bin_time = self.acquisition_time / 1E5
+        max_bin_time = self.acquisition_time / 1E3
         
         bin_times = [1E-6]
         next_bin_time = 1E-6 * spacing
@@ -7314,7 +7314,103 @@ class FCS_Fixer():
 
         return bin_times, pcmh, Mandel_Q_series
         
+    def add_pcmh_results(self,
+                         pcmh_results_ch1,
+                         pcmh_results_ch2,
+                         suppress_logging = False,
+                         calling_function = ''):
+        
+        # Unpack pcmh results tuples
+        bin_times_ch1, pcmh_ch1, _ = pcmh_results_ch1
+        bin_times_ch2, pcmh_ch2, _ = pcmh_results_ch2
+        
+        if not bin_times_ch1.shape[0] or bin_times_ch2.shape[0] or not np.all(bin_times_ch1 == bin_times_ch2):
+            raise ValueError('Cannot combine PCMH results - binning inconsistent!')
+            
+        pcmh_combined = np.zeros((np.max([pcmh_ch1.shape[0], pcmh_ch2.shape[0]]), bin_times_ch1.shape[0]), dtype = np.float64)
+        pcmh_combined[:pcmh_ch1.shape[0], :] += pcmh_ch1
+        pcmh_combined[:pcmh_ch2.shape[0], :] += pcmh_ch2
+        
+        
+        # Update Mandel's Q
+        photon_counts_x = np.arange(0, pcmh_combined.shape[0])
+        Mandel_Q_series = np.zeros_like(bin_times_ch1)
+        for i_bin_time in range(bin_times_ch1):
+            pch = pcmh_combined[:, i_bin_time]
+            mean_counts = np.sum(photon_counts_x * pch) / np.sum(pch)
+            var_counts = np.sum(photon_counts_x**2 * pch) / np.sum(pch) - mean_counts[i_bin_time]**2
+            Mandel_Q_series[i_bin_time] = (var_counts - mean_counts) / mean_counts
+                                 
+        if self._write_results:
+            # Write results to csv and png output
+            out_path_full = os.path.join(self._out_path, ('0' + str(self._out_file_counter)) if self._out_file_counter < 10 else str(self._out_file_counter))
+            self._out_file_counter += 1
+            
+            # Spreadsheet
+            
+            out_path_full_PCMH = out_path_full + '_PCMH_sum'
+        
+            out_table = pd.DataFrame(data = {str(bin_time): pcmh_combined[:,i_bin_time] for i_bin_time, bin_time in enumerate(bin_times_ch1)})
+            
+            out_table.to_csv(out_path_full_PCMH + '.csv', 
+                              index = False, 
+                              header = True)
 
+            out_path_full_Mandel_Q = out_path_full + '_Mandel_Q' + '_sum'
+        
+            out_table = pd.DataFrame(data = {'Bin Times [s]': bin_times_ch1,
+                                             'Mandel Q': Mandel_Q_series})
+            
+            out_table.to_csv(out_path_full_Mandel_Q + '.csv', 
+                              index = False, 
+                              header = True)
+            
+            # Figure
+            fig, ax = plt.subplots(nrows=1, 
+                                   ncols=2, 
+                                   sharex = False)
+            
+            # Left panel: PCMH
+            # Cycle through colors
+            prop_cycle = plt.rcParams['axes.prop_cycle']
+            colors = cycle(prop_cycle.by_key()['color'])
+
+            for i_pch in range(pcmh_combined.shape[1]):
+                iter_color = next(colors)
+                ax[0].semilogy(photon_counts_x, 
+                                pcmh_combined[:,i_pch],
+                                marker = '', 
+                                linestyle = '-', 
+                                alpha = 0.7,
+                                color = iter_color)
+            ax[0].set_title('PCH over time times')
+            ax[0].set_ylim(np.min(pcmh_combined[pcmh_combined>0]), np.max(pcmh_combined) * 1.25)
+            ax[0].legend()
+            
+            # Right panel: Mandel's Q
+            ax[1].plot(bin_times_ch1,
+                        Mandel_Q_series, 
+                        marker = 'o',
+                        linestyle = '-',
+                        color = 'k')
+            ax[1].set_title("Mandel's Q")
+            
+            fig.supxlabel('Photon counting multiple histograms (sum channel')
+
+            plt.savefig(out_path_full_PCMH + '.png', dpi=300)
+            plt.close()
+            
+        # Write to log, if desired
+        if self._write_log and not suppress_logging:
+            self.write_to_logfile(log_header = '''add_pcmh_results: Sum up PCMH results from two correlation channels.''',
+                                  log_message = f'''Results written to {out_path_full_PCMH}.csv/png''' if self._write_results else '',
+                                  calling_function = calling_function)
+        
+        return bin_times_ch1, pcmh_combined, Mandel_Q_series
+    
+    
+    
+    
     #%% large wrapper for everything
     def run_standard_pipeline(self,
                               channels_spec_1,
@@ -7323,6 +7419,8 @@ class FCS_Fixer():
                               use_drift_correction,
                               use_mse_filter,
                               use_flcs_bg_corr,
+                              write_intermediate_ccs = False,
+                              write_pcmh = True,
                               calling_function = '',
                               suppress_logging = False):
         '''
@@ -7365,6 +7463,14 @@ class FCS_Fixer():
             OPTIONAL bool. Specifies whether or not to use the attributes 
             self._weights_anomalous_segments and self._macro_times_correction_mse_filter
             to mask out photons labelled as being in an anomalous time segment.
+        write_intermediate_ccs :
+            OPTIONAL bool with default False. If True, an FCS output is calculated
+            and written after every filtering step. If False, FCS output is 
+            caclulated only at the end (or upon crashing of the pipeline, 
+            using whatever filters had been successfully prepared).
+        write_pcmh :
+            OPTIONAL bool with default True. Whether to calculate and export
+            photon counting (multiple) histograms output in addition to FCS output. 
         suppress_logging :
             OPTIONAL bool. If the function called with suppress_logging == True, the call will 
             not be registered in the log file even if the class instance has been 
@@ -7390,107 +7496,106 @@ class FCS_Fixer():
         # Is this auto- or cross-correlation? In the former case, we can skip some calculations.
         is_cross_corr = channels_spec_1 != channels_spec_2
         
+        if write_intermediate_ccs:
         # First correlation: No filters
-        _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
-                                             channels_spec_norm_ch2, 
-                                             use_drift_correction = False,
-                                             use_flcs_bg_corr = False,
-                                             use_burst_removal = False,
-                                             use_mse_filter = False,
-                                             calling_function = 'run_standard_pipeline',
-                                             suppress_logging = suppress_logging)
-        
-        # First filter: Burst removal
-        if use_burst_removal:
-            
-            # Auto-tune time trace bin width
-            time_trace_sampling = self.get_trace_time_scale(channels_spec_norm_ch1,
-                                                            calling_function = 'run_standard_pipeline',
-                                                            suppress_logging = suppress_logging)
-            
-            if is_cross_corr:
-                # If we have two-channel data, let's use a geometric mean of 
-                # time_trace_sampling suggestions for two the two channels as compromise
-                time_trace_sampling = np.sqrt(time_trace_sampling * self.get_trace_time_scale(channels_spec_norm_ch2,
-                                                                                              calling_function = 'run_standard_pipeline',
-                                                                                              suppress_logging = suppress_logging))
-                
-
-            # Get time traces
-            
-            if is_cross_corr:
-                # Two distinct channels
-                time_trace_counts_1, time_trace_t = self.get_time_trace(channels_spec_norm_ch1,
-                                                                        time_trace_sampling,
-                                                                        calling_function = 'run_standard_pipeline',
-                                                                        suppress_logging = suppress_logging)
-                
-                time_trace_counts_2, _ = self.get_time_trace(channels_spec_norm_ch2,
-                                                             time_trace_sampling,
-                                                             calling_function = 'run_standard_pipeline',
-                                                             suppress_logging = suppress_logging)
-                
-                # Concatenate for further processing
-                for_reshape = (time_trace_counts_1.shape[0], 1)
-                time_traces = np.concatenate((time_trace_counts_1.reshape(for_reshape), time_trace_counts_2.reshape(for_reshape)), axis = 1)
-                
-            else:
-                # Single channel
-                time_trace_counts, time_trace_t = self.get_time_trace(channels_spec_norm_ch1,
-                                                                      time_trace_sampling,
-                                                                      calling_function = 'run_standard_pipeline',
-                                                                      suppress_logging = suppress_logging)
-                
-                # We crete a dummy second dimension, although this is not even strictly required
-                time_traces = time_trace_counts.reshape((time_trace_counts.shape[0], 1))
-                
-            # Run actual burst removal
-            _ = self.run_burst_removal(time_traces, 
-                                       time_trace_sampling,
-                                       calling_function = 'run_standard_pipeline',
-                                       suppress_logging = suppress_logging)
-        
-            # Correlate with filters up to this point applied
             _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
                                                  channels_spec_norm_ch2, 
                                                  use_drift_correction = False,
                                                  use_flcs_bg_corr = False,
-                                                 use_burst_removal = use_burst_removal,
+                                                 use_burst_removal = False,
                                                  use_mse_filter = False,
                                                  calling_function = 'run_standard_pipeline',
                                                  suppress_logging = suppress_logging)
+        
+        # First filter: Burst removal
+        if use_burst_removal:
+            
+            try:
+                # Auto-tune time trace bin width
+                time_trace_sampling = self.get_trace_time_scale(channels_spec_norm_ch1,
+                                                                calling_function = 'run_standard_pipeline',
+                                                                suppress_logging = suppress_logging)
+                
+                if is_cross_corr:
+                    # If we have two-channel data, let's use a geometric mean of 
+                    # time_trace_sampling suggestions for two the two channels as compromise
+                    time_trace_sampling = np.sqrt(time_trace_sampling * self.get_trace_time_scale(channels_spec_norm_ch2,
+                                                                                                  calling_function = 'run_standard_pipeline',
+                                                                                                  suppress_logging = suppress_logging))
+                    
+    
+                # Get time traces
+                
+                if is_cross_corr:
+                    # Two distinct channels
+                    time_trace_counts_1, time_trace_t = self.get_time_trace(channels_spec_norm_ch1,
+                                                                            time_trace_sampling,
+                                                                            calling_function = 'run_standard_pipeline',
+                                                                            suppress_logging = suppress_logging)
+                    
+                    time_trace_counts_2, _ = self.get_time_trace(channels_spec_norm_ch2,
+                                                                 time_trace_sampling,
+                                                                 calling_function = 'run_standard_pipeline',
+                                                                 suppress_logging = suppress_logging)
+                    
+                    # Concatenate for further processing
+                    for_reshape = (time_trace_counts_1.shape[0], 1)
+                    time_traces = np.concatenate((time_trace_counts_1.reshape(for_reshape), time_trace_counts_2.reshape(for_reshape)), axis = 1)
+                    
+                else:
+                    # Single channel
+                    time_trace_counts, time_trace_t = self.get_time_trace(channels_spec_norm_ch1,
+                                                                          time_trace_sampling,
+                                                                          calling_function = 'run_standard_pipeline',
+                                                                          suppress_logging = suppress_logging)
+                    
+                    # We crete a dummy second dimension, although this is not even strictly required
+                    time_traces = time_trace_counts.reshape((time_trace_counts.shape[0], 1))
+                    
+                # Run actual burst removal
+                _ = self.run_burst_removal(time_traces, 
+                                           time_trace_sampling,
+                                           calling_function = 'run_standard_pipeline',
+                                           suppress_logging = suppress_logging)
+                
+                if write_intermediate_ccs or not (use_drift_correction or use_flcs_bg_corr or use_mse_filter):
+                    # Correlate with filters up to this point applied
+                    _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
+                                                         channels_spec_norm_ch2, 
+                                                         use_drift_correction = False,
+                                                         use_flcs_bg_corr = False,
+                                                         use_burst_removal = use_burst_removal,
+                                                         use_mse_filter = False,
+                                                         calling_function = 'run_standard_pipeline',
+                                                         suppress_logging = suppress_logging)
+                
+            except:
+                # Crash during burst removal
+                if not suppress_logging:
+                    self.write_to_logfile(log_message = 'Default pipeline crashed in burst removal. Trying to calculate and write correlation fucntion without filters.',
+                                          calling_function = 'run_standard_pipeline')
+                    
+                # Correlate with filters up to this point applied
+                _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
+                                                     channels_spec_norm_ch2, 
+                                                     use_drift_correction = False,
+                                                     use_flcs_bg_corr = False,
+                                                     use_burst_removal = False,
+                                                     use_mse_filter = False,
+                                                     calling_function = 'run_standard_pipeline',
+                                                     suppress_logging = suppress_logging)
+
         # END of burst removal block
         
         # Second filter: bleaching/drift correction
         if use_drift_correction:
             
-            # Get time trace
-            time_trace_sampling = self.get_trace_time_scale(channels_spec_norm_ch1,
-                                                            use_burst_removal = use_burst_removal,
-                                                            calling_function = 'run_standard_pipeline')
-            time_trace_counts, time_trace_t = self.get_time_trace(channels_spec_norm_ch1,
-                                                                  time_trace_sampling,
-                                                                  use_burst_removal = use_burst_removal,
-                                                                  calling_function = 'run_standard_pipeline',
-                                                                  suppress_logging = suppress_logging)
-            
-            # Run drift/bleaching correction
-            _ = self.polynomial_undrifting_rss(time_trace_counts, 
-                                               time_trace_t, 
-                                               channels_spec_norm_ch1,
-                                               use_burst_removal = use_burst_removal,
-                                               calling_function = 'run_standard_pipeline',
-                                               suppress_logging = suppress_logging)
-            
-            if is_cross_corr:
-                # Second channel
-                
+            try:
                 # Get time trace
-                time_trace_sampling = self.get_trace_time_scale(channels_spec_norm_ch2,
+                time_trace_sampling = self.get_trace_time_scale(channels_spec_norm_ch1,
                                                                 use_burst_removal = use_burst_removal,
-                                                                calling_function = 'run_standard_pipeline',
-                                                                suppress_logging = suppress_logging)
-                time_trace_counts, time_trace_t = self.get_time_trace(channels_spec_norm_ch2,
+                                                                calling_function = 'run_standard_pipeline')
+                time_trace_counts, time_trace_t = self.get_time_trace(channels_spec_norm_ch1,
                                                                       time_trace_sampling,
                                                                       use_burst_removal = use_burst_removal,
                                                                       calling_function = 'run_standard_pipeline',
@@ -7499,92 +7604,120 @@ class FCS_Fixer():
                 # Run drift/bleaching correction
                 _ = self.polynomial_undrifting_rss(time_trace_counts, 
                                                    time_trace_t, 
-                                                   channels_spec_norm_ch2,
+                                                   channels_spec_norm_ch1,
                                                    use_burst_removal = use_burst_removal,
                                                    calling_function = 'run_standard_pipeline',
                                                    suppress_logging = suppress_logging)
+                
+                if is_cross_corr:
+                    # Second channel
+                    
+                    # Get time trace
+                    time_trace_sampling = self.get_trace_time_scale(channels_spec_norm_ch2,
+                                                                    use_burst_removal = use_burst_removal,
+                                                                    calling_function = 'run_standard_pipeline',
+                                                                    suppress_logging = suppress_logging)
+                    time_trace_counts, time_trace_t = self.get_time_trace(channels_spec_norm_ch2,
+                                                                          time_trace_sampling,
+                                                                          use_burst_removal = use_burst_removal,
+                                                                          calling_function = 'run_standard_pipeline',
+                                                                          suppress_logging = suppress_logging)
+                    
+                    # Run drift/bleaching correction
+                    _ = self.polynomial_undrifting_rss(time_trace_counts, 
+                                                       time_trace_t, 
+                                                       channels_spec_norm_ch2,
+                                                       use_burst_removal = use_burst_removal,
+                                                       calling_function = 'run_standard_pipeline',
+                                                       suppress_logging = suppress_logging)
+    
+                if write_intermediate_ccs or not (use_flcs_bg_corr or use_mse_filter):
+                    # Correlate with filters up to this point applied
+                    _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
+                                                         channels_spec_norm_ch2, 
+                                                         use_drift_correction = use_drift_correction,
+                                                         use_flcs_bg_corr = False,
+                                                         use_burst_removal = use_burst_removal,
+                                                         use_mse_filter = False,
+                                                         calling_function = 'run_standard_pipeline',
+                                                         suppress_logging = suppress_logging)
 
-            # Correlate with filters up to this point applied
-            _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
-                                                 channels_spec_norm_ch2, 
-                                                 use_drift_correction = use_drift_correction,
-                                                 use_flcs_bg_corr = False,
-                                                 use_burst_removal = use_burst_removal,
-                                                 use_mse_filter = False,
-                                                 calling_function = 'run_standard_pipeline',
-                                                 suppress_logging = suppress_logging)
+            except:
+                # Crash during drift/bleaching correction
+                if not suppress_logging:
+                    self.write_to_logfile(log_message = 'Default pipeline crashed in drift/bleaching correction. Trying to calculate and write correlation function with filters calculated so far.',
+                                          calling_function = 'run_standard_pipeline')
+                    
+                # Correlate with filters up to this point applied
+                _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
+                                                     channels_spec_norm_ch2, 
+                                                     use_drift_correction = False,
+                                                     use_flcs_bg_corr = False,
+                                                     use_burst_removal = use_burst_removal,
+                                                     use_mse_filter = False,
+                                                     calling_function = 'run_standard_pipeline',
+                                                     suppress_logging = suppress_logging)
 
         # END of bleaching/drift correction block
         
         # Third filter: Removal of anomalous segments based on mse between correlation functions
         if use_mse_filter:
             
-            # Running this filter is a single function call, whether you have one or two channels
-            _ = self.run_mse_filter(channels_spec_norm_ch1, 
-                                    channels_spec_norm_ch2,
-                                    use_drift_correction = use_drift_correction,
-                                    use_burst_removal = use_burst_removal,
-                                    calling_function = 'run_standard_pipeline',
-                                    suppress_logging = suppress_logging)
-            
-            # Correlate with filters up to this point applied
-            _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
-                                                 channels_spec_norm_ch2, 
-                                                 use_drift_correction = use_drift_correction,
-                                                 use_flcs_bg_corr = False,
-                                                 use_burst_removal = use_burst_removal,
-                                                 use_mse_filter = use_mse_filter,
-                                                 calling_function = 'run_standard_pipeline',
-                                                 suppress_logging = suppress_logging)
-            
+            try:
+                # Running this filter is a single function call, whether you have one or two channels
+                _ = self.run_mse_filter(channels_spec_norm_ch1, 
+                                        channels_spec_norm_ch2,
+                                        use_drift_correction = use_drift_correction,
+                                        use_burst_removal = use_burst_removal,
+                                        calling_function = 'run_standard_pipeline',
+                                        suppress_logging = suppress_logging)
+                
+                if write_intermediate_ccs or not use_flcs_bg_corr:
+
+                    # Correlate with filters up to this point applied
+                    _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
+                                                         channels_spec_norm_ch2, 
+                                                         use_drift_correction = use_drift_correction,
+                                                         use_flcs_bg_corr = False,
+                                                         use_burst_removal = use_burst_removal,
+                                                         use_mse_filter = use_mse_filter,
+                                                         calling_function = 'run_standard_pipeline',
+                                                         suppress_logging = suppress_logging)
+                
+            except:
+                # Crash during anomalous segments removal
+                if not suppress_logging:
+                    self.write_to_logfile(log_message = 'Default pipeline crashed in anomalous segments removal. Trying to calculate and write correlation function with filters calculated so far.',
+                                          calling_function = 'run_standard_pipeline')
+                    
+                # Correlate with filters up to this point applied
+                _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
+                                                     channels_spec_norm_ch2, 
+                                                     use_drift_correction = use_drift_correction,
+                                                     use_flcs_bg_corr = False,
+                                                     use_burst_removal = use_burst_removal,
+                                                     use_mse_filter = False,
+                                                     calling_function = 'run_standard_pipeline',
+                                                     suppress_logging = suppress_logging)
+
         # END of anomalous segment removal block
         
         # Fourth filter: FLCS background subtraction
         if use_flcs_bg_corr:
             
-            # Get TCSPC histogram
-            tcspc_x, tcspc_y = self.get_tcspc_histogram(channels_spec_norm_ch1,
-                                                        use_drift_correction = use_drift_correction,
-                                                        use_burst_removal = use_burst_removal,
-                                                        use_mse_filter = use_mse_filter,
-                                                        calling_function = 'run_standard_pipeline',
-                                                        suppress_logging = suppress_logging)
-            
-            # Find suitable range for tail fitting, and perform tail fit (we simply start 2 ns after peak)
-            peak_position = np.argmax(tcspc_y)
-            fit_start = np.uint64(peak_position + np.ceil(2. / self._micro_time_resolution))
-            flat_background, _ = self.get_background_tail_fit(channels_spec_norm_ch1, 
-                                                              peak_position, 
-                                                              fit_start,
-                                                              use_drift_correction = use_drift_correction,
-                                                              use_burst_removal = use_burst_removal,
-                                                              use_mse_filter = use_mse_filter,
-                                                              calling_function = 'run_standard_pipeline',
-                                                              suppress_logging = suppress_logging)
-            
-            # Get FLCS weights
-            _ = self.get_flcs_background_filter(tcspc_x, 
-                                                tcspc_y, 
-                                                flat_background, 
-                                                channels_spec_norm_ch1,
-                                                calling_function = 'run_standard_pipeline',
-                                                suppress_logging = suppress_logging)
-            
-            if is_cross_corr:
-                # Second channel
-                
+            try:
                 # Get TCSPC histogram
-                tcspc_x, tcspc_y = self.get_tcspc_histogram(channels_spec_norm_ch2,
+                tcspc_x, tcspc_y = self.get_tcspc_histogram(channels_spec_norm_ch1,
                                                             use_drift_correction = use_drift_correction,
                                                             use_burst_removal = use_burst_removal,
                                                             use_mse_filter = use_mse_filter,
                                                             calling_function = 'run_standard_pipeline',
                                                             suppress_logging = suppress_logging)
                 
-                # Find suitable range for tail fitting, and perform tail fit
+                # Find suitable range for tail fitting, and perform tail fit (we simply start 2 ns after peak)
                 peak_position = np.argmax(tcspc_y)
                 fit_start = np.uint64(peak_position + np.ceil(2. / self._micro_time_resolution))
-                flat_background, _ = self.get_background_tail_fit(channels_spec_norm_ch2, 
+                flat_background, _ = self.get_background_tail_fit(channels_spec_norm_ch1, 
                                                                   peak_position, 
                                                                   fit_start,
                                                                   use_drift_correction = use_drift_correction,
@@ -7597,40 +7730,96 @@ class FCS_Fixer():
                 _ = self.get_flcs_background_filter(tcspc_x, 
                                                     tcspc_y, 
                                                     flat_background, 
-                                                    channels_spec_norm_ch2,
+                                                    channels_spec_norm_ch1,
                                                     calling_function = 'run_standard_pipeline',
                                                     suppress_logging = suppress_logging)
+                
+                if is_cross_corr:
+                    # Second channel
+                    
+                    # Get TCSPC histogram
+                    tcspc_x, tcspc_y = self.get_tcspc_histogram(channels_spec_norm_ch2,
+                                                                use_drift_correction = use_drift_correction,
+                                                                use_burst_removal = use_burst_removal,
+                                                                use_mse_filter = use_mse_filter,
+                                                                calling_function = 'run_standard_pipeline',
+                                                                suppress_logging = suppress_logging)
+                    
+                    # Find suitable range for tail fitting, and perform tail fit
+                    peak_position = np.argmax(tcspc_y)
+                    fit_start = np.uint64(peak_position + np.ceil(2. / self._micro_time_resolution))
+                    flat_background, _ = self.get_background_tail_fit(channels_spec_norm_ch2, 
+                                                                      peak_position, 
+                                                                      fit_start,
+                                                                      use_drift_correction = use_drift_correction,
+                                                                      use_burst_removal = use_burst_removal,
+                                                                      use_mse_filter = use_mse_filter,
+                                                                      calling_function = 'run_standard_pipeline',
+                                                                      suppress_logging = suppress_logging)
+                    
+                    # Get FLCS weights
+                    _ = self.get_flcs_background_filter(tcspc_x, 
+                                                        tcspc_y, 
+                                                        flat_background, 
+                                                        channels_spec_norm_ch2,
+                                                        calling_function = 'run_standard_pipeline',
+                                                        suppress_logging = suppress_logging)
+                
+                    # Correlate with filters up to this point applied
+                    _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
+                                                         channels_spec_norm_ch2, 
+                                                         use_drift_correction = use_drift_correction,
+                                                         use_flcs_bg_corr = use_flcs_bg_corr,
+                                                         use_burst_removal = use_burst_removal,
+                                                         use_mse_filter = use_mse_filter,
+                                                         calling_function = 'run_standard_pipeline',
+                                                         suppress_logging = suppress_logging)
 
-            # Correlate with filters up to this point applied
-            _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
-                                                 channels_spec_norm_ch2, 
-                                                 use_drift_correction = use_drift_correction,
-                                                 use_flcs_bg_corr = use_flcs_bg_corr,
+                
+            except:
+                # Crash during FLCS background subtraction
+                if not suppress_logging:
+                    self.write_to_logfile(log_message = 'Default pipeline crashed in FLCS background subtraction. Trying to calculate and write correlation function with filters calculated so far.',
+                                          calling_function = 'run_standard_pipeline')
+                    
+                # Correlate with filters up to this point applied
+                _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
+                                                     channels_spec_norm_ch2, 
+                                                     use_drift_correction = use_drift_correction,
+                                                     use_flcs_bg_corr = False,
+                                                     use_burst_removal = use_burst_removal,
+                                                     use_mse_filter = use_mse_filter,
+                                                     calling_function = 'run_standard_pipeline',
+                                                     suppress_logging = suppress_logging)
+
+            # END of background correction block
+            
+
+
+        if write_pcmh:
+            # Get PCMH as well
+            pcmh_results = self.get_PCMH(channels_spec_norm_ch1,
+                                         spacing = np.sqrt(2.),
+                                         normalize = False,
+                                         use_burst_removal = use_burst_removal,
+                                         use_mse_filter = use_mse_filter,
+                                         suppress_logging = suppress_logging,
+                                         calling_function = 'run_standard_pipeline'
+                                         )
+    
+            if is_cross_corr:
+                # Second channel
+                pcmh_results_ch2 = self.get_PCMH(channels_spec_norm_ch2,
+                                                 spacing = np.sqrt(2.),
+                                                 normalize = False,
                                                  use_burst_removal = use_burst_removal,
                                                  use_mse_filter = use_mse_filter,
-                                                 calling_function = 'run_standard_pipeline',
-                                                 suppress_logging = suppress_logging)
-            
-            # END of background correction block
-        
-        # Get PCMH as well
-        _ = self.get_PCMH(channels_spec_norm_ch1,
-                            spacing = np.sqrt(2.),
-                            normalize = False,
-                            use_burst_removal = use_burst_removal,
-                            use_mse_filter = use_mse_filter,
-                            suppress_logging = suppress_logging,
-                            calling_function = 'run_standard_pipeline'
-                            )
-
-        if is_cross_corr:
-            # Second channel
-            _ = self.get_PCMH(channels_spec_norm_ch2,
-                                spacing = np.sqrt(2.),
-                                normalize = False,
-                                use_burst_removal = use_burst_removal,
-                                use_mse_filter = use_mse_filter,
-                                suppress_logging = suppress_logging,
-                                calling_function = 'run_standard_pipeline'
-                                )
-
+                                                 suppress_logging = suppress_logging,
+                                                 calling_function = 'run_standard_pipeline'
+                                                 )
+                
+                # Also construct sum pcmh output for cross-correlation channel
+                _ = self.add_pcmh_results(pcmh_results,
+                                          pcmh_results_ch2,
+                                          suppress_logging = suppress_logging,
+                                          calling_function = 'run_standard_pipeline')
