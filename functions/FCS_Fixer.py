@@ -126,7 +126,10 @@ class Parallel_scheduler():
                  use_burst_removal = False,
                  use_drift_correction = False,
                  use_mse_filter = False,
-                 use_flcs_bg_corr = False):
+                 use_flcs_bg_corr = False,
+                 write_intermediate_ccs = False,
+                 write_pcmh = True
+                 ):
         '''
         
         Set up the global settings for parallel processing
@@ -173,6 +176,11 @@ class Parallel_scheduler():
         use_flcs_bg_corr : 
             OPTIONAL bool with default False. Whether to use FLCS to remove 
             laser-independent background.
+        write_intermediate_ccs :
+            OPTIONAL bool with default False. Whether or not to write intermediate
+            FCS output at every filtering step.
+        write_pcmh :
+            OPTIONAL bool with default True. Whether to add PC(M)H export to pipeline.
 
         '''
         
@@ -189,6 +197,10 @@ class Parallel_scheduler():
         self.use_drift_correction = use_drift_correction
         self.use_mse_filter = use_mse_filter
         self.use_flcs_bg_corr = use_flcs_bg_corr
+        self.write_intermediate_ccs = write_intermediate_ccs
+        self.write_pcmh = write_pcmh
+        
+        
         
     @staticmethod
     def run_standard_pipeline_all_channels(in_path,
@@ -200,6 +212,8 @@ class Parallel_scheduler():
                                            use_drift_correction,
                                            use_mse_filter,
                                            use_flcs_bg_corr,
+                                           write_intermediate_ccs = False,
+                                           write_pcmh = True,
                                            afterpulsing_params_path = '',
                                            list_of_channel_pairs = [],
                                            cross_corr_symm = False,
@@ -235,6 +249,11 @@ class Parallel_scheduler():
             OPTIONAL string/path with default '' (empty). Path to afterpulsing calibration
             file. Necessary if use_calibrated_AP_subtraction == True, otherwise 
             ignored.
+        write_intermediate_ccs :
+            OPTIONAL bool with default False. Whether or not to write intermediate
+            FCS output at every filtering step.
+        write_pcmh :
+            OPTIONAL bool with default True. Whether to add PC(M)H export to pipeline.
         list_of_channel_pairs :
             OPTIONAL iterable of 2-element iterables of channels_spec tuples, with syntax 
             as delivered by FCS_Fixer.get_channel_combinations(). Specifies which 
@@ -264,17 +283,17 @@ class Parallel_scheduler():
         out_path = os.path.join(in_dir, datetime.datetime.now().strftime("%Y%m%d_%H%M") +'_'+ out_name_common)
         
         fixer = FCS_Fixer(photon_data = photon_data, 
-                                   out_path = out_path,
-                                   tau_min = tau_min,
-                                   tau_max = tau_max,
-                                   sampling = sampling,
-                                   cross_corr_symm = cross_corr_symm,
-                                   correlation_method = correlation_method,
-                                   subtract_afterpulsing = use_calibrated_AP_subtraction,
-                                   afterpulsing_params_path = afterpulsing_params_path,
-                                   write_results = True,
-                                   include_header = False,
-                                   write_log = True)
+                           out_path = out_path,
+                           tau_min = tau_min,
+                           tau_max = tau_max,
+                           sampling = sampling,
+                           cross_corr_symm = cross_corr_symm,
+                           correlation_method = correlation_method,
+                           subtract_afterpulsing = use_calibrated_AP_subtraction,
+                           afterpulsing_params_path = afterpulsing_params_path,
+                           write_results = True,
+                           include_header = False,
+                           write_log = True)
         fixer.update_params()
         
         
@@ -292,7 +311,9 @@ class Parallel_scheduler():
                                             use_drift_correction,
                                             use_mse_filter,
                                             use_flcs_bg_corr,
-                                            job_name)
+                                            write_intermediate_ccs = write_intermediate_ccs,
+                                            write_pcmh = write_pcmh,
+                                            calling_function = job_name)
 
             except:
                 # If this channel combination failed, write that to log, and continue with next
@@ -327,6 +348,8 @@ class Parallel_scheduler():
                                                 use_drift_correction = self.use_drift_correction,
                                                 use_mse_filter = self.use_mse_filter,
                                                 use_flcs_bg_corr = self.use_flcs_bg_corr,
+                                                write_intermediate_ccs = self.write_intermediate_ccs,
+                                                write_pcmh = self.write_pcmh,
                                                 afterpulsing_params_path = self.afterpulsing_params_path,
                                                 list_of_channel_pairs = self.list_of_channel_pairs,
                                                 cross_corr_symm = self.cross_corr_symm,
@@ -7007,6 +7030,7 @@ class FCS_Fixer():
                 ext_indices = np.array([]),
                 use_burst_removal = False,
                 use_mse_filter = False,
+                more_channels_specs = None,
                 suppress_logging = False,
                 calling_function = ''
                 ):
@@ -7022,7 +7046,7 @@ class FCS_Fixer():
         ----------
         channels_spec: 
             Channel configuration specifier for the correlation operation. 
-            See description in self.check_channels_spec() for details.
+            See description in self.check_channels_spec() for details. 
         bin_time:
             Float specifying the desired bin width in seconds.
         normalize:
@@ -7042,6 +7066,12 @@ class FCS_Fixer():
             OPTIONAL bool. Specifies whether or not to use the attributes 
             self._weights_anomalous_segments and self._macro_times_correction_mse_filter
             to mask out photons labelled as being in an anomalous time segment.
+        more_channels_specs :
+            OPTIONAL list of channels_spec, default None. Offers the option to 
+            enter multiple channels_spec objects to create a PCH of a sum channel.
+            Please note that using this option currently is unsafe when use_burst_removal
+            or use_mse_filter is true, as the time traces may end up with different
+            excesed segments.
         suppress_logging :
             OPTIONAL bool. If the function called with suppress_logging == True, the call will 
             not be registered in the log file even if the Class instance has been 
@@ -7082,6 +7112,26 @@ class FCS_Fixer():
                                              suppress_logging = suppress_logging,
                                              calling_function = 'get_PCH')
         
+        if type(more_channels_specs) == list and len(more_channels_specs) > 0:
+            for channels_spec_add in more_channels_specs:
+                
+                # Check if entry is valid
+                channels_spec_add_norm = self.check_channels_spec(channels_spec_add)
+
+                time_trace_new, _ = self.get_time_trace(channels_spec_add_norm, 
+                                                         time_trace_sampling = bin_time,
+                                                         use_ext_weights = False,
+                                                         ext_indices = ext_indices,
+                                                         use_drift_correction = False,
+                                                         use_flcs_bg_corr = False,
+                                                         use_burst_removal = use_burst_removal,
+                                                         use_mse_filter = use_mse_filter,
+                                                         suppress_writing = True, # here we suppress the time trace writing
+                                                         suppress_logging = suppress_logging,
+                                                         calling_function = 'get_PCH')
+                
+                time_trace += time_trace_new
+
         photon_count_maximum = np.max(time_trace)
         # Get actul PCH
         pch, _ = np.histogram(time_trace,
@@ -7090,7 +7140,7 @@ class FCS_Fixer():
         
         photon_count_variance = np.var(time_trace)
         photon_count_mean = np.mean(time_trace)
-        Mandel_Q = (photon_count_variance - photon_count_mean) / photon_count_mean
+        Mandel_Q = photon_count_variance / photon_count_mean - 1
         
         # Write to log, if desired
         if self._write_log and not suppress_logging:
@@ -7107,9 +7157,6 @@ class FCS_Fixer():
                                     Histogram is characterized by Mandel's Q of {Mandel_Q}
                                     ''',
                                     calling_function = calling_function)
-
-        
-        
         
         return pch, Mandel_Q
     
@@ -7121,6 +7168,7 @@ class FCS_Fixer():
                 ext_indices = np.array([]),
                 use_burst_removal = False,
                 use_mse_filter = False,
+                more_channels_specs = None,
                 suppress_logging = False,
                 calling_function = ''
                 ):
@@ -7157,6 +7205,12 @@ class FCS_Fixer():
             OPTIONAL bool. Specifies whether or not to use the attributes 
             self._weights_anomalous_segments and self._macro_times_correction_mse_filter
             to mask out photons labelled as being in an anomalous time segment.
+        more_channels_specs :
+            OPTIONAL list of channels_spec, default None. Offers the option to 
+            enter multiple channels_spec objects to create a PCH of a sum channel.
+            Please note that using this option currently is unsafe when use_burst_removal
+            or use_mse_filter is true, as the time traces may end up with different
+            excesed segments.
         suppress_logging :
             OPTIONAL bool. If the function called with suppress_logging == True, the call will 
             not be registered in the log file even if the Class instance has been 
@@ -7190,7 +7244,7 @@ class FCS_Fixer():
         # We use all bin widths starting at 1 us going up in factors of "spacing"
         # until the last one where we get 1000 bins out of the data (ignoring 
         # possible loss due to MSE filter and whatnot)
-        max_bin_time = self.acquisition_time / 1E3
+        max_bin_time = self.acquisition_time / 1E4
         
         bin_times = [1E-6]
         next_bin_time = 1E-6 * spacing
@@ -7207,6 +7261,7 @@ class FCS_Fixer():
                                    ext_indices = ext_indices,
                                    use_burst_removal = use_burst_removal,
                                    use_mse_filter = use_mse_filter,
+                                   more_channels_specs = more_channels_specs,
                                    suppress_logging = suppress_logging,
                                    calling_function = 'get_PCMH'
                                    )
@@ -7224,6 +7279,7 @@ class FCS_Fixer():
                                         ext_indices = ext_indices,
                                         use_burst_removal = use_burst_removal,
                                         use_mse_filter = use_mse_filter,
+                                        more_channels_specs = more_channels_specs,
                                         suppress_logging = suppress_logging,
                                         calling_function = 'get_PCMH'
                                         )
@@ -7237,34 +7293,35 @@ class FCS_Fixer():
             out_path_full = os.path.join(self._out_path, ('0' + str(self._out_file_counter)) if self._out_file_counter < 10 else str(self._out_file_counter))
             self._out_file_counter += 1
             
-            # Spreadsheet
+            # Construct output names
+            out_path_full_PCMH = out_path_full + '_PCMH' + ''.join(['_ch' +str(element) for element in channels_spec[0]])
+            out_path_full_Mandel_Q = out_path_full + '_Mandel_Q' + ''.join(['_ch' + str(element) for element in channels_spec[0]])
             
-            out_path_full_PCMH = out_path_full + '_PCMH' + '_ch'.join([str(element) for element in channels_spec[0]])
+            # More channels?
+            if more_channels_specs != None:
+                for channels_spec_add in more_channels_specs:
+                    out_path_full_PCMH += ''.join(['_ch' +str(element) for element in channels_spec_add[0]])
+                    out_path_full_Mandel_Q += ''.join(['_ch' + str(element) for element in channels_spec_add[0]])
+
             # Update name according to applied corrections
             out_path_full_PCMH += ('_br' if use_burst_removal else '') + \
                                  ('_ar' if use_mse_filter else '')            
-
-        
+            out_path_full_Mandel_Q += ('_br' if use_burst_removal else '') + \
+                                 ('_ar' if use_mse_filter else '')            
+             
+            # Create and write spreadsheets
             out_table = pd.DataFrame(data = {str(bin_time): pcmh[:,i_bin_time] for i_bin_time, bin_time in enumerate(bin_times)})
-            
             out_table.to_csv(out_path_full_PCMH + '.csv', 
                               index = False, 
                               header = True)
-
-            out_path_full_Mandel_Q = out_path_full + '_Mandel_Q' + '_ch'.join([str(element) for element in channels_spec[0]])
-            # Update name according to applied corrections
-            out_path_full_Mandel_Q += ('_br' if use_burst_removal else '') + \
-                                 ('_ar' if use_mse_filter else '')            
-
         
             out_table = pd.DataFrame(data = {'Bin Times [s]': bin_times,
                                              'Mandel Q': Mandel_Q_series})
-            
             out_table.to_csv(out_path_full_Mandel_Q + '.csv', 
                               index = False, 
                               header = True)
             
-            # Figure
+            # Create and write figure
             fig, ax = plt.subplots(nrows=1, ncols=2, sharex = False)
             pch_x = np.arange(0, pcmh.shape[0])
             
@@ -7275,15 +7332,16 @@ class FCS_Fixer():
 
             for i_pch in range(pcmh.shape[1]):
                 iter_color = next(colors)
+                # Plot is nicer/easier to compare with normalized PCMH
+                pch_norm = pcmh[:,i_pch] / np.sum(pcmh[:,i_pch])
                 ax[0].semilogy(pch_x, 
-                                pcmh[:,i_pch],
-                                marker = '', 
-                                linestyle = '-', 
-                                alpha = 0.7,
-                                color = iter_color)
-            ax[0].set_title('PCH over time times')
-            ax[0].set_ylim(np.min(pcmh[pcmh>0]), np.max(pcmh) * 1.25)
-            ax[0].legend()
+                               pch_norm,
+                               marker = '', 
+                               linestyle = '-', 
+                               alpha = 0.7,
+                               color = iter_color)
+            ax[0].set_title('Norm. PCH over bin time')
+            ax[0].set_ylim(np.min(pcmh[pcmh>0]), 1.1)
             
             # Right panel: Mandel's Q
             ax[1].plot(bin_times,
@@ -7293,7 +7351,6 @@ class FCS_Fixer():
                         color = 'k')
             ax[1].set_title("Mandel's Q")
             
-            fig.supxlabel('Photon counting multiple histograms')
 
             plt.savefig(out_path_full_PCMH + '.png', dpi=300)
             plt.close()
@@ -7314,102 +7371,7 @@ class FCS_Fixer():
 
         return bin_times, pcmh, Mandel_Q_series
         
-    def add_pcmh_results(self,
-                         pcmh_results_ch1,
-                         pcmh_results_ch2,
-                         suppress_logging = False,
-                         calling_function = ''):
-        
-        # Unpack pcmh results tuples
-        bin_times_ch1, pcmh_ch1, _ = pcmh_results_ch1
-        bin_times_ch2, pcmh_ch2, _ = pcmh_results_ch2
-        
-        if not bin_times_ch1.shape[0] or bin_times_ch2.shape[0] or not np.all(bin_times_ch1 == bin_times_ch2):
-            raise ValueError('Cannot combine PCMH results - binning inconsistent!')
-            
-        pcmh_combined = np.zeros((np.max([pcmh_ch1.shape[0], pcmh_ch2.shape[0]]), bin_times_ch1.shape[0]), dtype = np.float64)
-        pcmh_combined[:pcmh_ch1.shape[0], :] += pcmh_ch1
-        pcmh_combined[:pcmh_ch2.shape[0], :] += pcmh_ch2
-        
-        
-        # Update Mandel's Q
-        photon_counts_x = np.arange(0, pcmh_combined.shape[0])
-        Mandel_Q_series = np.zeros_like(bin_times_ch1)
-        for i_bin_time in range(bin_times_ch1):
-            pch = pcmh_combined[:, i_bin_time]
-            mean_counts = np.sum(photon_counts_x * pch) / np.sum(pch)
-            var_counts = np.sum(photon_counts_x**2 * pch) / np.sum(pch) - mean_counts[i_bin_time]**2
-            Mandel_Q_series[i_bin_time] = (var_counts - mean_counts) / mean_counts
-                                 
-        if self._write_results:
-            # Write results to csv and png output
-            out_path_full = os.path.join(self._out_path, ('0' + str(self._out_file_counter)) if self._out_file_counter < 10 else str(self._out_file_counter))
-            self._out_file_counter += 1
-            
-            # Spreadsheet
-            
-            out_path_full_PCMH = out_path_full + '_PCMH_sum'
-        
-            out_table = pd.DataFrame(data = {str(bin_time): pcmh_combined[:,i_bin_time] for i_bin_time, bin_time in enumerate(bin_times_ch1)})
-            
-            out_table.to_csv(out_path_full_PCMH + '.csv', 
-                              index = False, 
-                              header = True)
 
-            out_path_full_Mandel_Q = out_path_full + '_Mandel_Q' + '_sum'
-        
-            out_table = pd.DataFrame(data = {'Bin Times [s]': bin_times_ch1,
-                                             'Mandel Q': Mandel_Q_series})
-            
-            out_table.to_csv(out_path_full_Mandel_Q + '.csv', 
-                              index = False, 
-                              header = True)
-            
-            # Figure
-            fig, ax = plt.subplots(nrows=1, 
-                                   ncols=2, 
-                                   sharex = False)
-            
-            # Left panel: PCMH
-            # Cycle through colors
-            prop_cycle = plt.rcParams['axes.prop_cycle']
-            colors = cycle(prop_cycle.by_key()['color'])
-
-            for i_pch in range(pcmh_combined.shape[1]):
-                iter_color = next(colors)
-                ax[0].semilogy(photon_counts_x, 
-                                pcmh_combined[:,i_pch],
-                                marker = '', 
-                                linestyle = '-', 
-                                alpha = 0.7,
-                                color = iter_color)
-            ax[0].set_title('PCH over time times')
-            ax[0].set_ylim(np.min(pcmh_combined[pcmh_combined>0]), np.max(pcmh_combined) * 1.25)
-            ax[0].legend()
-            
-            # Right panel: Mandel's Q
-            ax[1].plot(bin_times_ch1,
-                        Mandel_Q_series, 
-                        marker = 'o',
-                        linestyle = '-',
-                        color = 'k')
-            ax[1].set_title("Mandel's Q")
-            
-            fig.supxlabel('Photon counting multiple histograms (sum channel')
-
-            plt.savefig(out_path_full_PCMH + '.png', dpi=300)
-            plt.close()
-            
-        # Write to log, if desired
-        if self._write_log and not suppress_logging:
-            self.write_to_logfile(log_header = '''add_pcmh_results: Sum up PCMH results from two correlation channels.''',
-                                  log_message = f'''Results written to {out_path_full_PCMH}.csv/png''' if self._write_results else '',
-                                  calling_function = calling_function)
-        
-        return bin_times_ch1, pcmh_combined, Mandel_Q_series
-    
-    
-    
     
     #%% large wrapper for everything
     def run_standard_pipeline(self,
@@ -7479,15 +7441,15 @@ class FCS_Fixer():
             string, optional This is a handle specifically meant for logging 
             which function had called this function. To make the code stack 
             more understandable in the log.
-
+        
         Returns
         -------
         None.
-
+        
         '''
         
-        # Input check
-        if not self._write_results:
+        # Input check 
+        if not self._write_results: 
             raise Warning('run_standard_pipeline() does not do anything useful with write_results == False!')
             
         channels_spec_norm_ch1 = self.check_channels_spec(channels_spec_1)
@@ -7496,7 +7458,7 @@ class FCS_Fixer():
         # Is this auto- or cross-correlation? In the former case, we can skip some calculations.
         is_cross_corr = channels_spec_1 != channels_spec_2
         
-        if write_intermediate_ccs:
+        if write_intermediate_ccs or not (use_burst_removal or use_drift_correction or use_flcs_bg_corr or use_mse_filter):
         # First correlation: No filters
             _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
                                                  channels_spec_norm_ch2, 
@@ -7798,28 +7760,43 @@ class FCS_Fixer():
 
         if write_pcmh:
             # Get PCMH as well
-            pcmh_results = self.get_PCMH(channels_spec_norm_ch1,
-                                         spacing = np.sqrt(2.),
-                                         normalize = False,
-                                         use_burst_removal = use_burst_removal,
-                                         use_mse_filter = use_mse_filter,
-                                         suppress_logging = suppress_logging,
-                                         calling_function = 'run_standard_pipeline'
-                                         )
+            _ = self.get_PCMH(channels_spec_norm_ch1,
+                              spacing = np.sqrt(2.),
+                              normalize = False,
+                              use_burst_removal = use_burst_removal,
+                              use_mse_filter = use_mse_filter,
+                              more_channels_specs = None,
+                              suppress_logging = suppress_logging,
+                              calling_function = 'run_standard_pipeline'
+                              )
     
             if is_cross_corr:
                 # Second channel
-                pcmh_results_ch2 = self.get_PCMH(channels_spec_norm_ch2,
-                                                 spacing = np.sqrt(2.),
-                                                 normalize = False,
-                                                 use_burst_removal = use_burst_removal,
-                                                 use_mse_filter = use_mse_filter,
-                                                 suppress_logging = suppress_logging,
-                                                 calling_function = 'run_standard_pipeline'
-                                                 )
+                _ = self.get_PCMH(channels_spec_norm_ch2,
+                                  spacing = np.sqrt(2.),
+                                  normalize = False,
+                                  use_burst_removal = use_burst_removal,
+                                  use_mse_filter = use_mse_filter,
+                                  more_channels_specs = None,
+                                  suppress_logging = suppress_logging,
+                                  calling_function = 'run_standard_pipeline'
+                                  )
                 
                 # Also construct sum pcmh output for cross-correlation channel
-                _ = self.add_pcmh_results(pcmh_results,
-                                          pcmh_results_ch2,
-                                          suppress_logging = suppress_logging,
-                                          calling_function = 'run_standard_pipeline')
+                try:
+                    # Can be unsafe, although it should work with the way the pipeline is set up
+                    _ = self.get_PCMH(channels_spec_norm_ch1,
+                                      spacing = np.sqrt(2.),
+                                      normalize = False,
+                                      use_burst_removal = use_burst_removal,
+                                      use_mse_filter = use_mse_filter,
+                                      more_channels_specs = [channels_spec_norm_ch2],
+                                      suppress_logging = suppress_logging,
+                                      calling_function = 'run_standard_pipeline'
+                                      )
+                except:
+                    # Crash during FLCS background subtraction
+                    if not suppress_logging:
+                        self.write_to_logfile(log_message = 'Could not construct sum channel PC(M)H. Logging traceback:' + traceback.format_exc(),
+                                              calling_function = 'run_standard_pipeline')
+
