@@ -7133,7 +7133,7 @@ class FCS_Fixer():
                 time_trace += time_trace_new
 
         photon_count_maximum = np.max(time_trace)
-        # Get actul PCH
+        # Get actual PCH
         pch, _ = np.histogram(time_trace,
                               bins = np.arange(0, photon_count_maximum + 1),
                               density = normalize)
@@ -7727,15 +7727,15 @@ class FCS_Fixer():
                                                         calling_function = 'run_standard_pipeline',
                                                         suppress_logging = suppress_logging)
                 
-                    # Correlate with filters up to this point applied
-                    _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
-                                                         channels_spec_norm_ch2, 
-                                                         use_drift_correction = use_drift_correction,
-                                                         use_flcs_bg_corr = use_flcs_bg_corr,
-                                                         use_burst_removal = use_burst_removal,
-                                                         use_mse_filter = use_mse_filter,
-                                                         calling_function = 'run_standard_pipeline',
-                                                         suppress_logging = suppress_logging)
+                # Correlate with filters up to this point applied
+                _ = self.get_correlation_uncertainty(channels_spec_norm_ch1,
+                                                     channels_spec_norm_ch2, 
+                                                     use_drift_correction = use_drift_correction,
+                                                     use_flcs_bg_corr = use_flcs_bg_corr,
+                                                     use_burst_removal = use_burst_removal,
+                                                     use_mse_filter = use_mse_filter,
+                                                     calling_function = 'run_standard_pipeline',
+                                                     suppress_logging = suppress_logging)
 
                 
             except:
