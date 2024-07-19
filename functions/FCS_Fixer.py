@@ -23,7 +23,7 @@ import traceback # For logging some specific exceptions caught exceptions
 import multiprocessing # For running simple processing pipelines in a parallel fashion
 
 
-#%% Small helper structures
+#%% Small helper structure
 
 def isint(object_to_check):
     '''
@@ -4346,7 +4346,7 @@ class FCS_Fixer():
             
             # Wrap stuff for file writing, and perform CSV export
             acr_col = np.zeros_like(lag_times)
-            acr_col[:3] = np.array([acr1, acr2, self._acquisition_time]) * 1E9
+            acr_col[:3] = np.array([acr1 * 1E9, acr2 * 1E9, self._acquisition_time * 1E-9])
             out_table = pd.DataFrame(data = {'Lagtime[s]':lag_times * 1E-9, # from ns to s
                                              'Correlation': cc,
                                              'ACR[Hz]': acr_col,
