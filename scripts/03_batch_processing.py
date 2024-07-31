@@ -15,6 +15,10 @@ process all of them for all channel combination present in the respective file.
 Currently all FCS_Fixer methods are used with default settings. Compare the
 function calls to those in the Jupyter Notebook to figure out which keyword arguments
 you can use to adapt the script to your data, if the default parameters do not work well.
+
+Actually, this is a bit of an old version that has not been maintained in a while.
+It works, but some details in the default pipeline have changed!
+
 '''
 
 

@@ -127,8 +127,10 @@ class Parallel_scheduler():
                  use_drift_correction = False,
                  use_mse_filter = False,
                  use_flcs_bg_corr = False,
+                 default_uncertainty_method = 'Wohland',
                  write_intermediate_ccs = False,
-                 write_pcmh = True
+                 write_pcmh = True,
+                 out_dir = ''
                  ):
         '''
         
@@ -176,11 +178,25 @@ class Parallel_scheduler():
         use_flcs_bg_corr : 
             OPTIONAL bool with default False. Whether to use FLCS to remove 
             laser-independent background.
+        default_uncertainty_method : 
+            OPTIONAL string with default 'Wohland'. Alternative is 'Bootstrap'.
+            Choice of uncertainty calculation method to be used by FCS_Fixer.get_correlation_uncertainty()
+            If 'Wohland' is chosen, FCS_Fixer.get_Wohland_SD() is used as the default
+            method of standard deviation calculation, and FCS_Fixer.get_bootstrap_SD()
+            as the backup method. If 'Bootstrap' is chosen, the software will 
+            directly go to FCS_Fixer.get_bootstrap_SD().
         write_intermediate_ccs :
             OPTIONAL bool with default False. Whether or not to write intermediate
             FCS output at every filtering step.
         write_pcmh :
             OPTIONAL bool with default True. Whether to add PC(M)H export to pipeline.
+        out_dir :
+            OPTIONAL string with empty str as default. If empty, a subfolder 
+            will be created next to the input file. If a dir is given, the 
+            software will instead create a directory in out_dir that mirrors 
+            the last up to 3 layers of directory hierarchy in in_path and place 
+            the output there - convenient for collecting output from multiple 
+            input experiments.
 
         '''
         
@@ -197,8 +213,10 @@ class Parallel_scheduler():
         self.use_drift_correction = use_drift_correction
         self.use_mse_filter = use_mse_filter
         self.use_flcs_bg_corr = use_flcs_bg_corr
+        self.default_uncertainty_method = default_uncertainty_method
         self.write_intermediate_ccs = write_intermediate_ccs
         self.write_pcmh = write_pcmh
+        self.out_dir = out_dir
         
         
         
@@ -212,12 +230,14 @@ class Parallel_scheduler():
                                            use_drift_correction,
                                            use_mse_filter,
                                            use_flcs_bg_corr,
+                                           default_uncertainty_method = 'Wohland',
                                            write_intermediate_ccs = False,
                                            write_pcmh = True,
                                            afterpulsing_params_path = '',
                                            list_of_channel_pairs = [],
                                            cross_corr_symm = False,
                                            correlation_method = 'default',
+                                           out_dir = '',
                                            job_name = ''):
         '''
         Load a file into FCS_Fixer, and run the standard pipeline in all
@@ -245,6 +265,13 @@ class Parallel_scheduler():
             with anomalous correlation function.
         use_flcs_bg_corr : 
             Bool. Whether to use FLCS to remove laser-independent background.
+        default_uncertainty_method : 
+            OPTIONAL string with default 'Wohland'. Alternative is 'Bootstrap'.
+            Choice of uncertainty calculation method to be used by FCS_Fixer.get_correlation_uncertainty()
+            If 'Wohland' is chosen, FCS_Fixer.get_Wohland_SD() is used as the default
+            method of standard deviation calculation, and FCS_Fixer.get_bootstrap_SD()
+            as the backup method. If 'Bootstrap' is chosen, the software will 
+            directly go to FCS_Fixer.get_bootstrap_SD().
         afterpulsing_params_path :
             OPTIONAL string/path with default '' (empty). Path to afterpulsing calibration
             file. Necessary if use_calibrated_AP_subtraction == True, otherwise 
@@ -269,6 +296,13 @@ class Parallel_scheduler():
             OPTIONAL string with defaut 'default', alternative 'lamb'. Denotes 
             which correlation function calculation algorithm to use (passed into
             tttrlib.Correlator() class).
+        out_dir :
+            OPTIONAL string with empty str as default. If empty, a subfolder 
+            will be created next to the input file. If a dir is given, the 
+            software will instead create a directory in out_dir that mirrors 
+            the last up to 3 layers of directory hierarchy in in_path and place 
+            the output there - convenient for collecting output from multiple 
+            input experiments.
         job_name : 
             OPTIONAL string with default '' (empty). Passed into 
             FCS_Fixer.write_to_log() as the "calling_function" name from 
@@ -280,8 +314,51 @@ class Parallel_scheduler():
         
         in_dir, in_file = os.path.split(in_path)
         out_name_common = os.path.splitext(in_file)[0]
-        out_path = os.path.join(in_dir, datetime.datetime.now().strftime("%Y%m%d_%H%M") +'_'+ out_name_common)
         
+        if out_dir == '':
+            out_path = os.path.join(in_dir, out_name_common + '_' + datetime.datetime.now().strftime("%Y%m%d_%H%M"))
+            
+        elif type(out_dir) == str:
+            # We have an excplicit out_dir to use
+            
+            # First sequentially split the in_dir to mirror up to 3 hierarchy levels
+            dir_levels = 0
+            try:
+                tmpdir, out_dir1 = os.path.split(in_dir)
+                dir_levels += 1
+            except:
+                pass
+            
+            try:
+                tmpdir, out_dir2 = os.path.split(tmpdir)
+                dir_levels += 1
+            except:
+                pass
+            
+            try:
+                _, out_dir3 = os.path.split(tmpdir)
+                dir_levels += 1
+            except:
+                pass
+            
+            if dir_levels == 3:
+                out_dir = os.path.join(out_dir, out_dir3)
+                if not os.path.exists(out_dir):
+                    os.makedirs(out_dir)
+                    
+            if dir_levels >= 2:
+                out_dir = os.path.join(out_dir, out_dir2)
+                if not os.path.exists(out_dir):
+                    os.makedirs(out_dir)
+
+            if dir_levels >= 1:
+                out_dir = os.path.join(out_dir, out_dir1)
+                if not os.path.exists(out_dir):
+                    os.makedirs(out_dir)
+                
+            # Complete out_path
+            out_path = os.path.join(out_dir, out_name_common + '_' + datetime.datetime.now().strftime("%Y%m%d_%H%M"))
+
         fixer = FCS_Fixer(photon_data = photon_data, 
                            out_path = out_path,
                            tau_min = tau_min,
@@ -311,6 +388,7 @@ class Parallel_scheduler():
                                             use_drift_correction,
                                             use_mse_filter,
                                             use_flcs_bg_corr,
+                                            default_uncertainty_method = default_uncertainty_method,
                                             write_intermediate_ccs = write_intermediate_ccs,
                                             write_pcmh = write_pcmh,
                                             calling_function = job_name)
@@ -348,12 +426,14 @@ class Parallel_scheduler():
                                                 use_drift_correction = self.use_drift_correction,
                                                 use_mse_filter = self.use_mse_filter,
                                                 use_flcs_bg_corr = self.use_flcs_bg_corr,
+                                                default_uncertainty_method = self.default_uncertainty_method,
                                                 write_intermediate_ccs = self.write_intermediate_ccs,
                                                 write_pcmh = self.write_pcmh,
                                                 afterpulsing_params_path = self.afterpulsing_params_path,
                                                 list_of_channel_pairs = self.list_of_channel_pairs,
                                                 cross_corr_symm = self.cross_corr_symm,
                                                 correlation_method = self.correlation_method,
+                                                out_dir = self.out_dir,
                                                 job_name = f'process_{process_id}')
 
         
@@ -1777,7 +1857,7 @@ class FCS_Fixer():
         # out_path
         if out_path == None:
             # Empty: Create a default folder named based on a time tag
-            self._out_path = os.path.join(os.getcwd(), datetime.datetime.now().strftime("%Y%m%d_%H%M") + 'CFcleaner_output') 
+            self._out_path = os.path.join(os.getcwd(), datetime.datetime.now().strftime("%Y%m%d_%H%M") + 'FCS_Fixer_output') 
             
         elif os.path.isdir(out_path):
             # Exists already, we can work with that.
@@ -4691,7 +4771,7 @@ class FCS_Fixer():
         suppress_writing :
             OPTIONAL bool with default False. If true, direct writing of the time trace into
             csv files is suppressed, as these can get ridiculously large and in fact can 
-            consume a good part of FCS_fixer's entire runtime.
+            consume a good part of FCS_Fixer's entire runtime.
         suppress_logging :
             OPTIONAL bool. If the function called with suppress_logging == True, the call will 
             not be registered in the log file even if the class instance has been 
@@ -4775,7 +4855,7 @@ class FCS_Fixer():
 
             # Create and save spreadsheet
             out_table = pd.DataFrame(data ={'Time[s]': time_trace_bin_centers,
-                                            'Counts': time_trace})
+                                            'Counts': np.uint32(time_trace)})
                     
             out_table.to_csv(out_path_full + '.csv', 
                              index = False, 
@@ -5291,7 +5371,7 @@ class FCS_Fixer():
 
                     # Create spreadsheet
                     out_table = pd.DataFrame(data ={'Time[s]': time_trace_bin_centers,
-                                                    'Counts': time_traces.sum(axis=1),
+                                                    'Counts': np.uint32(time_traces.sum(axis=1)),
                                                     'Is_burst': np.uint8(burst_bins)})
 
                 else:
@@ -5343,7 +5423,7 @@ class FCS_Fixer():
 
                 # Create spreadsheet
                 out_table = pd.DataFrame(data ={'Time[s]': time_trace_bin_centers,
-                                                'Counts': time_traces,
+                                                'Counts': np.uint32(time_traces),
                                                 'Is_burst': np.uint8(burst_bins)})
 
             # Same irrespective of number of traces and multi_channel_handling
@@ -5667,7 +5747,7 @@ class FCS_Fixer():
 
             # Create and save spreadsheet
             out_table = pd.DataFrame(data ={'Time[s]': time_trace_bin_centers*1E-9,
-                                            'Counts_Raw': time_trace,
+                                            'Counts_Raw': np.uint32(time_trace),
                                             'Fit': time_trace_poly,
                                             'Counts_Corrected': time_trace_undrift})
                     
@@ -6405,7 +6485,7 @@ class FCS_Fixer():
 
             # Create spreadsheet
             out_table = pd.DataFrame(data ={'Time[ns]': tcspc_x_ns,
-                                            'Counts': tcspc_y})
+                                            'Counts': np.uint32(tcspc_y)})
             out_table.to_csv(out_path_full + '.csv', 
                              index = False, 
                              header = self._include_header)
@@ -6537,7 +6617,7 @@ class FCS_Fixer():
 
             # Create spreadsheet
             out_table = pd.DataFrame(data ={'Time[ns]': irf_fit.x * self._micro_time_resolution,
-                                            'Counts': irf_fit.y,
+                                            'Counts': np.uint32(irf_fit.y),
                                             'Fit': irf_fit.prediction})
             
             out_table.to_csv(out_path_full + '.csv', 
@@ -6719,7 +6799,7 @@ class FCS_Fixer():
 
             # Create spreadsheet
             out_table = pd.DataFrame(data ={'Time[ns]': tcspc_x_crop_ns,
-                                            'Counts': tail_fit.y,
+                                            'Counts': np.uint32(tail_fit.y),
                                             'Fit': tail_fit.prediction})
             
             out_table.to_csv(out_path_full + '.csv', 
@@ -6994,7 +7074,7 @@ class FCS_Fixer():
             tcspc_y_full[tcspc_x[nonzero_mask]] = tcspc_y
             
             out_table = pd.DataFrame(data ={'Index': tcspc_x_full,
-                                            'Sum_TCSPC': tcspc_y_full,
+                                            'Sum_TCSPC': np.uint32(tcspc_y_full),
                                             'Signal_pattern': patterns_norm_full[:,0],
                                             'Background_pattern': patterns_norm_full[:,1],
                                             'Signal_filter': flcs_weights_full[:,0],
@@ -7163,7 +7243,7 @@ class FCS_Fixer():
     
     def get_PCMH(self,
                 channels_spec,
-                spacing = np.sqrt(2.),
+                spacing = 2.,
                 normalize = False,
                 ext_indices = np.array([]),
                 use_burst_removal = False,
@@ -7341,7 +7421,7 @@ class FCS_Fixer():
                                alpha = 0.7,
                                color = iter_color)
             ax[0].set_title('Norm. PCH over bin time')
-            ax[0].set_ylim(np.min(pcmh[pcmh>0]), 1.1)
+            ax[0].set_ylim(1E-6, 1)
             
             # Right panel: Mandel's Q
             ax[1].plot(bin_times,
@@ -7381,6 +7461,7 @@ class FCS_Fixer():
                               use_drift_correction,
                               use_mse_filter,
                               use_flcs_bg_corr,
+                              default_uncertainty_method = 'Wohland',
                               write_intermediate_ccs = False,
                               write_pcmh = True,
                               calling_function = '',
@@ -7425,6 +7506,13 @@ class FCS_Fixer():
             OPTIONAL bool. Specifies whether or not to use the attributes 
             self._weights_anomalous_segments and self._macro_times_correction_mse_filter
             to mask out photons labelled as being in an anomalous time segment.
+        default_uncertainty_method : 
+            OPTIONAL string with default 'Wohland'. Alternative is 'Bootstrap'.
+            Choice of uncertainty calculation method to be used by self.get_correlation_uncertainty()
+            If 'Wohland' is chosen, self.get_Wohland_SD() is used as the default
+            method of standard deviation calculation, and self.get_bootstrap_SD()
+            as the backup method. If 'Bootstrap' is chosen, the software will 
+            directly go to self.get_bootstrap_SD().
         write_intermediate_ccs :
             OPTIONAL bool with default False. If True, an FCS output is calculated
             and written after every filtering step. If False, FCS output is 
@@ -7466,6 +7554,7 @@ class FCS_Fixer():
                                                  use_flcs_bg_corr = False,
                                                  use_burst_removal = False,
                                                  use_mse_filter = False,
+                                                 default_uncertainty_method = default_uncertainty_method,
                                                  calling_function = 'run_standard_pipeline',
                                                  suppress_logging = suppress_logging)
         
@@ -7528,6 +7617,7 @@ class FCS_Fixer():
                                                          use_flcs_bg_corr = False,
                                                          use_burst_removal = use_burst_removal,
                                                          use_mse_filter = False,
+                                                         default_uncertainty_method = default_uncertainty_method,
                                                          calling_function = 'run_standard_pipeline',
                                                          suppress_logging = suppress_logging)
                 
@@ -7544,6 +7634,7 @@ class FCS_Fixer():
                                                      use_flcs_bg_corr = False,
                                                      use_burst_removal = False,
                                                      use_mse_filter = False,
+                                                     default_uncertainty_method = default_uncertainty_method,
                                                      calling_function = 'run_standard_pipeline',
                                                      suppress_logging = suppress_logging)
 
@@ -7601,6 +7692,7 @@ class FCS_Fixer():
                                                          use_flcs_bg_corr = False,
                                                          use_burst_removal = use_burst_removal,
                                                          use_mse_filter = False,
+                                                         default_uncertainty_method = default_uncertainty_method,
                                                          calling_function = 'run_standard_pipeline',
                                                          suppress_logging = suppress_logging)
 
@@ -7617,6 +7709,7 @@ class FCS_Fixer():
                                                      use_flcs_bg_corr = False,
                                                      use_burst_removal = use_burst_removal,
                                                      use_mse_filter = False,
+                                                     default_uncertainty_method = default_uncertainty_method,
                                                      calling_function = 'run_standard_pipeline',
                                                      suppress_logging = suppress_logging)
 
@@ -7643,6 +7736,7 @@ class FCS_Fixer():
                                                          use_flcs_bg_corr = False,
                                                          use_burst_removal = use_burst_removal,
                                                          use_mse_filter = use_mse_filter,
+                                                         default_uncertainty_method = default_uncertainty_method,
                                                          calling_function = 'run_standard_pipeline',
                                                          suppress_logging = suppress_logging)
                 
@@ -7659,6 +7753,7 @@ class FCS_Fixer():
                                                      use_flcs_bg_corr = False,
                                                      use_burst_removal = use_burst_removal,
                                                      use_mse_filter = False,
+                                                     default_uncertainty_method = default_uncertainty_method,
                                                      calling_function = 'run_standard_pipeline',
                                                      suppress_logging = suppress_logging)
 
@@ -7734,6 +7829,7 @@ class FCS_Fixer():
                                                      use_flcs_bg_corr = use_flcs_bg_corr,
                                                      use_burst_removal = use_burst_removal,
                                                      use_mse_filter = use_mse_filter,
+                                                     default_uncertainty_method = default_uncertainty_method,
                                                      calling_function = 'run_standard_pipeline',
                                                      suppress_logging = suppress_logging)
 
@@ -7751,6 +7847,7 @@ class FCS_Fixer():
                                                      use_flcs_bg_corr = False,
                                                      use_burst_removal = use_burst_removal,
                                                      use_mse_filter = use_mse_filter,
+                                                     default_uncertainty_method = default_uncertainty_method,
                                                      calling_function = 'run_standard_pipeline',
                                                      suppress_logging = suppress_logging)
 
