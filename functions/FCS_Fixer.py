@@ -16,6 +16,7 @@ import datetime # Time stamps
 import matplotlib.pyplot as plt # Plotting
 import pandas as pd # exporting tables as .csv
 from itertools import cycle # used only in plotting
+import glob
 
 # misc
 import warnings # For suppressing expectable but pointless warnings
@@ -310,8 +311,14 @@ class Parallel_scheduler():
 
 
         '''
-        photon_data = tttrlib.TTTR(in_path,'PTU')
-        
+        if os.path.splitext(in_path)[1] == '.ptu':
+            photon_data = tttrlib.TTTR(in_path,'PTU')
+            
+            
+        elif os.path.splitext(in_path)[1] == '.spc':
+            photon_data = tttrlib.TTTR(in_path,'SPC-130')
+
+            
         in_dir, in_file = os.path.split(in_path)
         out_name_common = os.path.splitext(in_file)[0]
         
@@ -1440,11 +1447,14 @@ class FCS_Fixer():
         elif isiterable(channels_indices) and not np.all([isint(element) for element in channels_indices]):
             raise ValueError('Invalid input for channels_indices: Must be int or list of int')
 
-        if micro_time_gates == None:
-            # No micro time gating
-            # We simply hand the channel index/channels indices into 
-            # check_channels_spec() to construct a standard channels_spec
-            channels_spec = FCS_Fixer.check_channels_spec(channels_indices)
+        if not isiterable(micro_time_gates):
+            if micro_time_gates == None:
+                # No micro time gating
+                # We simply hand the channel index/channels indices into 
+                # check_channels_spec() to construct a standard channels_spec
+                channels_spec = FCS_Fixer.check_channels_spec(channels_indices)
+            else:
+                raise ValueError('Invalid input for micro_time_gates: Must be None, or an iterable of floats enumerating [first_start, first_stop, second_start, second_stop, ...]')
 
         elif isiterable(micro_time_gates):
             # Looks like the user was trying to specify a micro time gating...
@@ -1498,7 +1508,8 @@ class FCS_Fixer():
 
                 else:
                     # We constructed something interesting, time to piece it together
-                    channels_spec = (tuple(channels_indices), (tuple(micro_time_cutoffs), tuple(micro_time_gates_to_use)))
+                    # channels_spec = (tuple(channels_indices,), (tuple(micro_time_cutoffs), tuple(micro_time_gates_to_use)))
+                    channels_spec = ((channels_indices,), ((*micro_time_cutoffs,), (*micro_time_gates_to_use,)))
                     
                 
         else:
