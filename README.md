@@ -81,7 +81,7 @@ One known issue Jupyter Notebook we'd like to mention here as we encountered it 
 ### Development
 The module is built around tttrlib (https://github.com/Fluorescence-Tools/tttrlib), and some functions also use code snippets taken from tttrlib application examples.
 
-FCS_Fixer core developer and contact for inquiries: Jan-Hagen Krohn (krohn@biochem.mpg.de)
+FCS_Fixer core developer and contact for inquiries: Jan-Hagen Krohn (jan-hagen.krohn@uk-essen.de)
 
 Assistance in pipeline development and debugging: Béla Frohn, Lise Isnel, Yusuf Qutbuddin
 
