@@ -16,7 +16,6 @@ import datetime # Time stamps
 import matplotlib.pyplot as plt # Plotting
 import pandas as pd # exporting tables as .csv
 from itertools import cycle # used only in plotting
-import glob
 
 # misc
 import warnings # For suppressing expectable but pointless warnings
@@ -108,369 +107,6 @@ def lin_scaling_of_data(data_raw,
     data_scaled = data_raw * fit_res
         
     return data_scaled
-    
-    
-class Parallel_scheduler():
-    # Relatively simple class wrapping FCS_Fixer to run the 
-    # "standard pipeline" using parallel processing
-    
-    def __init__(self,
-                 in_paths,
-                 tau_min = 1E-6,
-                 tau_max = 1.,  
-                 sampling = 6,
-                 correlation_method = 'default',
-                 cross_corr_symm = False,
-                 use_calibrated_AP_subtraction = False,
-                 afterpulsing_params_path = '',
-                 list_of_channel_pairs = [],
-                 use_burst_removal = False,
-                 use_drift_correction = False,
-                 use_mse_filter = False,
-                 use_flcs_bg_corr = False,
-                 default_uncertainty_method = 'Wohland',
-                 write_intermediate_ccs = False,
-                 write_pcmh = True,
-                 out_dir = ''
-                 ):
-        '''
-        
-        Set up the global settings for parallel processing
-
-        Parameters
-        ----------
-        in_paths : 
-            List of paths to raw data.
-        tau_min, tau_max : TYPE, optional
-            OPTIONAL Floats. Minimum and maximum lag time of correlation in seconds, 
-            respectively, with defaults 1E-6 and 1.
-        sampling : 
-            OPTIONAL Int with default 6. Density of sampling of correlation function.
-        correlation_method : 
-            OPTIONAL string with defaut 'default', alternative 'lamb'. Denotes 
-            which correlation function calculation algorithm to use (passed into
-            tttrlib.Correlator() class).
-        cross_corr_symm : 
-            OPTIONAL bool with default False. In case of cross-correlation function
-            calculation, should we assume time symmetry? Doing so increases 
-            signal-to-noise ratio by averaging forward and backward cross
-            correlation. Auto-correlations are not affected.
-        use_calibrated_AP_subtraction : 
-            OPTIONAL bool with default False. Whether to use calibrated
-            afterpulsing subtraction (unused for cross-correlation and for
-            auto-correlations if FLCS background subtraction is used.)
-        afterpulsing_params_path :
-            OPTIONAL string/path with default '' (empty). Path to afterpulsing calibration
-            file. Necessary if use_calibrated_AP_subtraction == True, otherwise 
-            ignored.
-        list_of_channel_pairs :
-            OPTIONAL iterable of 2-element iterables of channels_spec tuples, with syntax 
-            as delivered by FCS_Fixer.get_channel_combinations(). Specifies which 
-            correlation operations to perform. If left empty, the software will perform all
-            possible auto- and cross-correlations between channels that have a somewhat 
-            reasonable number of photons in the raw data.
-        use_burst_removal : 
-            OPTIONAL bool with default False. Whether to use burst removal filter.
-        use_drift_correction : 
-            OPTIONAL bool with default False. Whether to use bleaching/drift correction
-        use_mse_filter : 
-            OPTIONAL bool with default False. Whether to use MSE-based removal
-            of measurement time segments with anomalous correlation function.
-        use_flcs_bg_corr : 
-            OPTIONAL bool with default False. Whether to use FLCS to remove 
-            laser-independent background.
-        default_uncertainty_method : 
-            OPTIONAL string with default 'Wohland'. Alternative is 'Bootstrap'.
-            Choice of uncertainty calculation method to be used by FCS_Fixer.get_correlation_uncertainty()
-            If 'Wohland' is chosen, FCS_Fixer.get_Wohland_SD() is used as the default
-            method of standard deviation calculation, and FCS_Fixer.get_bootstrap_SD()
-            as the backup method. If 'Bootstrap' is chosen, the software will 
-            directly go to FCS_Fixer.get_bootstrap_SD().
-        write_intermediate_ccs :
-            OPTIONAL bool with default False. Whether or not to write intermediate
-            FCS output at every filtering step.
-        write_pcmh :
-            OPTIONAL bool with default True. Whether to add PC(M)H export to pipeline.
-        out_dir :
-            OPTIONAL string with empty str as default. If empty, a subfolder 
-            will be created next to the input file. If a dir is given, the 
-            software will instead create a directory in out_dir that mirrors 
-            the last up to 3 layers of directory hierarchy in in_path and place 
-            the output there - convenient for collecting output from multiple 
-            input experiments.
-
-        '''
-        
-        self.in_paths = in_paths
-        self.tau_min = tau_min
-        self.tau_max = tau_max
-        self.sampling = sampling
-        self.correlation_method = correlation_method
-        self.cross_corr_symm = cross_corr_symm
-        self.use_calibrated_AP_subtraction = use_calibrated_AP_subtraction
-        self.afterpulsing_params_path = afterpulsing_params_path
-        self.list_of_channel_pairs = list_of_channel_pairs
-        self.use_burst_removal = use_burst_removal
-        self.use_drift_correction = use_drift_correction
-        self.use_mse_filter = use_mse_filter
-        self.use_flcs_bg_corr = use_flcs_bg_corr
-        self.default_uncertainty_method = default_uncertainty_method
-        self.write_intermediate_ccs = write_intermediate_ccs
-        self.write_pcmh = write_pcmh
-        self.out_dir = out_dir
-        
-        
-        
-    @staticmethod
-    def run_standard_pipeline_all_channels(in_path,
-                                           tau_min,
-                                           tau_max, 
-                                           sampling,
-                                           use_calibrated_AP_subtraction,
-                                           use_burst_removal,
-                                           use_drift_correction,
-                                           use_mse_filter,
-                                           use_flcs_bg_corr,
-                                           default_uncertainty_method = 'Wohland',
-                                           write_intermediate_ccs = False,
-                                           write_pcmh = True,
-                                           afterpulsing_params_path = '',
-                                           list_of_channel_pairs = [],
-                                           cross_corr_symm = False,
-                                           correlation_method = 'default',
-                                           out_dir = '',
-                                           job_name = ''):
-        '''
-        Load a file into FCS_Fixer, and run the standard pipeline in all
-        channel combinations available.
-
-        Parameters
-        ----------
-        in_path : 
-            Path to raw data.
-        tau_min, tau_max : 
-            Floats. Minimum and maximum lag time of correlation in seconds, 
-            respectively.
-        sampling : 
-            Int. Density of sampling of correlation function.
-        use_calibrated_AP_subtraction : 
-            Bool. Whether to use calibrated afterpulsing subtraction (unused
-            for cross-correlation and for auto-correlations if FLCS background 
-            subtraction is used.)
-        use_burst_removal : 
-            Bool. Whether to use burst removal filter.
-        use_drift_correction : 
-            Bool. Whether to use bleaching/drift correction.
-        use_mse_filter : 
-            Bool. Whether to use MSE-based removal of measurement time segments 
-            with anomalous correlation function.
-        use_flcs_bg_corr : 
-            Bool. Whether to use FLCS to remove laser-independent background.
-        default_uncertainty_method : 
-            OPTIONAL string with default 'Wohland'. Alternative is 'Bootstrap'.
-            Choice of uncertainty calculation method to be used by FCS_Fixer.get_correlation_uncertainty()
-            If 'Wohland' is chosen, FCS_Fixer.get_Wohland_SD() is used as the default
-            method of standard deviation calculation, and FCS_Fixer.get_bootstrap_SD()
-            as the backup method. If 'Bootstrap' is chosen, the software will 
-            directly go to FCS_Fixer.get_bootstrap_SD().
-        afterpulsing_params_path :
-            OPTIONAL string/path with default '' (empty). Path to afterpulsing calibration
-            file. Necessary if use_calibrated_AP_subtraction == True, otherwise 
-            ignored.
-        write_intermediate_ccs :
-            OPTIONAL bool with default False. Whether or not to write intermediate
-            FCS output at every filtering step.
-        write_pcmh :
-            OPTIONAL bool with default True. Whether to add PC(M)H export to pipeline.
-        list_of_channel_pairs :
-            OPTIONAL iterable of 2-element iterables of channels_spec tuples, with syntax 
-            as delivered by FCS_Fixer.get_channel_combinations(). Specifies which 
-            correlation operations to perform. If left empty, the software will perform all
-            possible auto- and cross-correlations between channels that have a somewhat 
-            reasonable number of photons in the raw data.
-        cross_corr_symm : 
-            OPTIONAL bool with default False. In case of cross-correlation function
-            calculation, should we assume time symmetry? Doing so increases 
-            signal-to-noise ratio by averaging forward and backward cross
-            correlation. Auto-correlations are not affected.
-        correlation_method : 
-            OPTIONAL string with defaut 'default', alternative 'lamb'. Denotes 
-            which correlation function calculation algorithm to use (passed into
-            tttrlib.Correlator() class).
-        out_dir :
-            OPTIONAL string with empty str as default. If empty, a subfolder 
-            will be created next to the input file. If a dir is given, the 
-            software will instead create a directory in out_dir that mirrors 
-            the last up to 3 layers of directory hierarchy in in_path and place 
-            the output there - convenient for collecting output from multiple 
-            input experiments.
-        job_name : 
-            OPTIONAL string with default '' (empty). Passed into 
-            FCS_Fixer.write_to_log() as the "calling_function" name from 
-            which high-level methods are being called (for logging).
-
-
-        '''
-        if os.path.splitext(in_path)[1] == '.ptu':
-            photon_data = tttrlib.TTTR(in_path,'PTU')
-            
-            
-        elif os.path.splitext(in_path)[1] == '.spc':
-            photon_data = tttrlib.TTTR(in_path,'SPC-130')
-
-            
-        in_dir, in_file = os.path.split(in_path)
-        out_name_common = os.path.splitext(in_file)[0]
-        
-        if out_dir == '':
-            out_path = os.path.join(in_dir, out_name_common + '_' + datetime.datetime.now().strftime("%Y%m%d_%H%M"))
-            
-        elif type(out_dir) == str:
-            # We have an excplicit out_dir to use
-            
-            # First sequentially split the in_dir to mirror up to 3 hierarchy levels
-            dir_levels = 0
-            try:
-                tmpdir, out_dir1 = os.path.split(in_dir)
-                dir_levels += 1
-            except:
-                pass
-            
-            try:
-                tmpdir, out_dir2 = os.path.split(tmpdir)
-                dir_levels += 1
-            except:
-                pass
-            
-            try:
-                _, out_dir3 = os.path.split(tmpdir)
-                dir_levels += 1
-            except:
-                pass
-            
-            if dir_levels == 3:
-                out_dir = os.path.join(out_dir, out_dir3)
-                if not os.path.exists(out_dir):
-                    os.makedirs(out_dir)
-                    
-            if dir_levels >= 2:
-                out_dir = os.path.join(out_dir, out_dir2)
-                if not os.path.exists(out_dir):
-                    os.makedirs(out_dir)
-
-            if dir_levels >= 1:
-                out_dir = os.path.join(out_dir, out_dir1)
-                if not os.path.exists(out_dir):
-                    os.makedirs(out_dir)
-                
-            # Complete out_path
-            out_path = os.path.join(out_dir, out_name_common + '_' + datetime.datetime.now().strftime("%Y%m%d_%H%M"))
-
-        fixer = FCS_Fixer(photon_data = photon_data, 
-                           out_path = out_path,
-                           tau_min = tau_min,
-                           tau_max = tau_max,
-                           sampling = sampling,
-                           cross_corr_symm = cross_corr_symm,
-                           correlation_method = correlation_method,
-                           subtract_afterpulsing = use_calibrated_AP_subtraction,
-                           afterpulsing_params_path = afterpulsing_params_path,
-                           write_results = True,
-                           include_header = False,
-                           write_log = True)
-        fixer.update_params()
-        
-        
-        # Auto-detect all channels in the file and enumerate all combinations to correlate, if not specified
-        if list_of_channel_pairs == []:
-            list_of_channel_pairs = fixer.get_channel_combinations(min_photons = 1000)
-
-        # Perform all correlations
-        for channels_spec_1, channels_spec_2 in list_of_channel_pairs:
-            
-            try: 
-                fixer.run_standard_pipeline(channels_spec_1,
-                                            channels_spec_2,
-                                            use_burst_removal,
-                                            use_drift_correction,
-                                            use_mse_filter,
-                                            use_flcs_bg_corr,
-                                            default_uncertainty_method = default_uncertainty_method,
-                                            write_intermediate_ccs = write_intermediate_ccs,
-                                            write_pcmh = write_pcmh,
-                                            calling_function = job_name)
-
-            except:
-                # If this channel combination failed, write that to log, and continue with next
-                fixer.write_to_logfile(log_header = 'Error: Logging traceback.',
-                                         log_message = traceback.format_exc(),
-                                         calling_function = job_name)
-                                         
-                # pass # just skip if this channel combination failed
-
-
-    def par_process_wrapper(self,
-                            process_id):
-        '''
-        Uses the process_id to identify a file and start its processing
-
-        Parameters
-        ----------
-        process_id : 
-            Int. Index of file to process within self.in_paths list, which also 
-            serves as process ID.
-
-        '''
-
-        print(f'[{process_id}] Processing ' + self.in_paths[process_id] + '...')
-
-        self.run_standard_pipeline_all_channels(in_path = self.in_paths[process_id],
-                                                tau_min = self.tau_min,
-                                                tau_max = self.tau_max, 
-                                                sampling = self.sampling,
-                                                use_calibrated_AP_subtraction = self.use_calibrated_AP_subtraction,
-                                                use_burst_removal = self.use_burst_removal,
-                                                use_drift_correction = self.use_drift_correction,
-                                                use_mse_filter = self.use_mse_filter,
-                                                use_flcs_bg_corr = self.use_flcs_bg_corr,
-                                                default_uncertainty_method = self.default_uncertainty_method,
-                                                write_intermediate_ccs = self.write_intermediate_ccs,
-                                                write_pcmh = self.write_pcmh,
-                                                afterpulsing_params_path = self.afterpulsing_params_path,
-                                                list_of_channel_pairs = self.list_of_channel_pairs,
-                                                cross_corr_symm = self.cross_corr_symm,
-                                                correlation_method = self.correlation_method,
-                                                out_dir = self.out_dir,
-                                                job_name = f'process_{process_id}')
-
-        
-    def run_parallel_processing(self,
-                                process_count):
-        '''
-        Execute assign and parallel jobs.
-
-        Parameters
-        ----------
-        process_count : 
-            Int. Number of parallel processing cores to use.
-
-
-        '''
-        # Create pool
-        pool = multiprocessing.Pool(processes = process_count)
-        
-        try:
-            # Parallel processing wrapper
-            pool.map(self.par_process_wrapper, np.arange(len(self.in_paths)))
-        
-        except:
-            # Something went wrong - whatever, not too much we can do
-            traceback.print_exc()
-
-        finally:
-            # In any case, close parpool at the end
-            pool.close()
-
 
     
 class G_diff_3dim_1comp():
@@ -1090,8 +726,7 @@ class Polynomial_fit():
             np.array with residuals of current prediction weighted by uncertainties.
 
         '''
-        # Wrapper for g3ddiff1comp_fun() that is the target for minimization
-        residual = self.counts - self.polynomial_expression(coefficients)
+        residual = self.counts - self.polynomial_fun(coefficients)
         
         return residual / self.sigma_counts
 
@@ -1116,7 +751,7 @@ class Polynomial_fit():
         fitted_params = result.params
 
         # Residuals and goodness-of-fit        
-        prediction = self.polynomial_expression(fitted_params)
+        prediction = self.polynomial_fun(fitted_params)
         chi_squared = np.sum(((self.counts - prediction) /self.sigma_counts)**2)
         
         n_data_points = self.counts.shape[0]
@@ -1400,7 +1035,7 @@ class TCSPC_quick_fit():
 
 class FCS_Fixer():
     ### Class attributes
-    __DATE = '2023-09-11'
+    __DATE = '2026-08-01'
     
 
     #%% Static methods
@@ -1798,7 +1433,7 @@ class FCS_Fixer():
                  tau_max = 1.0,
                  sampling = 8,
                  cross_corr_symm = False,
-                 correlation_method = 'default',
+                 correlation_method = 'wahl',
                  subtract_afterpulsing = False,
                  afterpulsing_params_path = '', # Default is dummy, must be specified if subtract_afterpulsing == True,
                  weights_ext = None,
@@ -1824,8 +1459,8 @@ class FCS_Fixer():
             self._macro_times_correction_mse_filter = np.zeros_like(self._macro_times)
             
             # Store some parameters for convenience
-            self._micro_time_resolution = self._photon_data.header.micro_time_resolution
-            self._macro_time_resolution = self._photon_data.header.macro_time_resolution
+            self._micro_time_resolution = self._photon_data.header.micro_time_resolution * 1e9 # Internal time units by default in ns
+            self._macro_time_resolution = self._photon_data.header.macro_time_resolution * 1e9
             self._acquisition_time = np.max(self._photon_data.macro_times) * self._macro_time_resolution
             self._n_total_photons = self._macro_times.shape[0]            
             self._n_micro_time_bins = self._photon_data.get_number_of_micro_time_channels()
@@ -1833,10 +1468,10 @@ class FCS_Fixer():
             self._n_channels = np.max(self._routing_channels) + 1
             
             # Weights
-            self._weights_burst_removal = np.ones_like(self._macro_times, dtype = np.bool8)
+            self._weights_burst_removal = np.ones_like(self._macro_times, dtype = bool)
             self._weights_undrift = np.ones_like(self._macro_times, dtype = np.float16)
             self._weights_flcs_bg_corr = np.ones_like(self._macro_times, dtype = np.float16)
-            self._weights_mse_filter = np.ones_like(self._macro_times, dtype = np.bool8)
+            self._weights_mse_filter = np.ones_like(self._macro_times, dtype = bool)
             if weights_ext == None:
                 self._weights_ext = np.ones_like(self._macro_times, dtype = np.float16)
             elif weights_ext.shape[0] == self._n_total_photons:
@@ -1907,12 +1542,11 @@ class FCS_Fixer():
             raise ValueError("Invalid input encountered for cross_corr_symm. Must be bool.")
         
         # correlation_method
-        if correlation_method == 'default' or correlation_method == 'lamb':
+        if correlation_method in ('wahl', 'felekyan', 'laurence'):
             self._correlation_method = correlation_method
-            
         else:
-            raise ValueError("Invalid input encountered for correlation_method. Permitted are either 'default' or 'lamb'.")
-        
+            raise ValueError("correlation_method must be 'wahl', 'felekyan', or 'laurence'.")
+                    
         # subtract_afterpulsing
         if type(subtract_afterpulsing) == bool:
             self._subtract_afterpulsing = subtract_afterpulsing
@@ -2148,10 +1782,10 @@ class FCS_Fixer():
             self._routing_channels = np.unique(self._photon_data.routing_channels)
             self._n_channels = np.max(self._routing_channels) + 1
             
-            self._weights_burst_removal = np.ones_like(self._macro_times, dtype = np.bool8)
+            self._weights_burst_removal = np.ones_like(self._macro_times, dtype = bool)
             self._weights_undrift = np.ones_like(self._macro_times, dtype = np.float16)
             self._weights_flcs_bg_corr = np.ones_like(self._macro_times, dtype = np.float16)
-            self._weights_mse_filter = np.ones_like(self._macro_times, dtype = np.bool8)
+            self._weights_mse_filter = np.ones_like(self._macro_times, dtype = bool)
             self._weights_ext = np.ones_like(self._macro_times, dtype = np.float16)
 
             # Register that data is loaded
@@ -2392,23 +2026,29 @@ class FCS_Fixer():
     def cross_corr_symm(self):
         return self._cross_corr_symm
         
+    '''
+        correlation_method : 
+            OPTIONAL string with defaut 'wahl', alternatives 'felekyan', 'laurence'.
+            Denotes which correlation function calculation algorithm to use 
+            (passed into tttrlib.Correlator() class).
+'''
     
     # correlation_method
     @property
     def correlation_method(self):
         '''
         Which code to use in the backend for the actual correlation function calculation?
-        String that must be either 'default' or 'lamb'
+        String that must be either 'wahl', 'felekyan', or 'laurence'
         '''
         return self._correlation_method
     
     @correlation_method.setter
     def correlation_method(self, new_correlation_method):
-        if new_correlation_method == 'default' or new_correlation_method == 'lamb':
+        if new_correlation_method in ['wahl', 'felekyan', 'laurence']:
             self._correlation_method = new_correlation_method
             
         else:
-            raise ValueError("Invalid input encountered for correlation_method. Permitted are either 'default' or 'lamb'.")
+            raise ValueError("Invalid input encountered for correlation_method. Permitted are 'wahl', 'felekyan', or 'laurence'.")
             
     @correlation_method.getter
     def correlation_method(self):
@@ -2617,7 +2257,7 @@ class FCS_Fixer():
 
         '''
         # Check what time resolution is needed
-        if self._tau_min < 20 * self._macro_time_resolution:
+        if self._tau_min < 5 * self._macro_time_resolution:
             # High time resolution needed
             self._micro_time_corr = True
             resolution = self._micro_time_resolution
@@ -2998,7 +2638,7 @@ class FCS_Fixer():
         cc = corr.get_corr_normalized()
         
         # Crop to queried lag time range, and return
-        lag_times = corr.get_x_axis_normalized() * self._macro_time_resolution
+        lag_times = corr.get_x_axis() * self._macro_time_resolution
         keep = np.logical_and(lag_times >= tau_min, lag_times <= tau_max)
 
         return lag_times[keep], cc[keep]
@@ -3102,7 +2742,7 @@ class FCS_Fixer():
             
         
         # Get selection
-        mask_select = np.ones(macro_times.shape, dtype = np.bool8)
+        mask_select = np.ones(macro_times.shape, dtype = bool)
 
         # Channel-based selection.
         indices_channels = self._photon_data.get_selection_by_channel(channels)
@@ -3161,7 +2801,7 @@ class FCS_Fixer():
             else: # Use multiple gates
             
                 # Start by creating an all-false array
-                selection_micro_time = np.zeros((self._n_total_photons), dtype = np.bool8)
+                selection_micro_time = np.zeros((self._n_total_photons), dtype = bool)
                 
                 # Fill up with photons that fall into each gate
                 for gate_index in micro_time_gate_indx:
@@ -3427,6 +3067,23 @@ class FCS_Fixer():
                                                                                 suppress_logging = suppress_logging,
                                                                                 calling_function = 'correlation_apply_filters')
         
+        if len(macro_times_ch1) == 0:
+            raise ValueError(f'''No photons found for channels_spec_1={channels_spec_norm_ch1}.
+Available routing channels in this file:
+{sorted(int(c) for c in np.unique(self._routing_channels))}.
+This usually means the requested channel does not exist
+in this measurement (e.g. a single-detector acquisition
+where a second channel was still requested for cross-
+correlation or PIE).''')
+        if len(macro_times_ch2) == 0:
+            raise ValueError(f'''No photons found for macro_times_ch2={macro_times_ch2}.
+Available routing channels in this file:
+{sorted(int(c) for c in np.unique(self._routing_channels))}.
+This usually means the requested channel does not exist
+in this measurement (e.g. a single-detector acquisition
+where a second channel was still requested for cross-
+correlation or PIE).''')
+            
         # Remove possible offset from actual measurement start
         window_start = np.min([np.min(macro_times_ch1), np.min(macro_times_ch2)])
         macro_times_ch1 -= window_start
@@ -3441,7 +3098,7 @@ class FCS_Fixer():
         corr.n_bins = self._sampling
         corr.n_casc = int(self._n_casc) 
         corr.method = self._correlation_method
-        corr.set_events(macro_times_ch1, 
+        corr.set_events(macro_times_ch1,
                         weights_ch1, 
                         macro_times_ch2, 
                         weights_ch2)
@@ -3453,7 +3110,11 @@ class FCS_Fixer():
                                 self._n_micro_time_bins)
             
         cc = corr.get_corr_normalized()
-        lag_times = corr.get_x_axis_normalized() * self._macro_time_resolution
+        lag_times = corr.get_x_axis() 
+        if self._micro_time_corr:
+            lag_times *= self._micro_time_resolution
+        else:
+            lag_times *= self._macro_time_resolution
 
         # Further treatment of cc
         # Start by unpacking channel_config further for the following logic
@@ -3469,18 +3130,19 @@ class FCS_Fixer():
             corr_rev.n_bins = self._sampling
             corr_rev.n_casc = int(self._n_casc)
             corr_rev.method = self._correlation_method
-            corr_rev.set_events(macro_times_ch2, 
-                            weights_ch2, 
-                            macro_times_ch1, 
-                            weights_ch1)
+            corr_rev.set_events(macro_times_ch2,
+                                weights_ch2, 
+                                macro_times_ch1, 
+                                weights_ch1)
             
             if self._micro_time_corr:
                 corr_rev.make_fine = True
                 corr_rev.set_microtimes(micro_times_ch2,
-                                        micro_times_ch1, 
+                                        micro_times_ch1,  
                                         self._n_micro_time_bins)  
-                
+
             cc_rev = corr_rev.get_corr_normalized()
+            
             # Average forward and backward cc, and subtract +1 offset
             cc_processed = (cc + cc_rev) / 2 
             cc_processed -= 1
@@ -3497,16 +3159,16 @@ class FCS_Fixer():
             corr_rev.n_bins = self._sampling
             corr_rev.n_casc = int(self._n_casc)
             corr_rev.method = self._correlation_method
-            corr_rev.set_events(macro_times_ch2, 
-                            weights_ch2, 
-                            macro_times_ch1, 
-                            weights_ch1)
+            corr_rev.set_events(macro_times_ch2,
+                                weights_ch2, 
+                                macro_times_ch1, 
+                                weights_ch1)
             
             if self._micro_time_corr:
                 corr_rev.make_fine = True
                 corr_rev.set_microtimes(micro_times_ch2,
-                                        micro_times_ch1, 
-                                        self._n_micro_time_bins)    
+                                        micro_times_ch1,  
+                                        self._n_micro_time_bins)  
                 
             cc_rev = corr_rev.get_corr_normalized()
             
@@ -3523,7 +3185,7 @@ class FCS_Fixer():
                                                       suppress_logging = suppress_logging,
                                                       calling_function = 'correlation_apply_filters (backward call)')
                 
-            cc_processed = (cc + cc_rev) / 2 -1
+            cc_processed = (cc + cc_rev) / 2 - 1
             comment_string = 'Calculated as cross-correlation function betwen different micro time gates within the same channel, with assumption of time symmetry.' # for log
 
         elif not self._cross_corr_symm and channel_1 == channel_2 and micro_time_gates_1 != micro_time_gates_2: 
@@ -5133,7 +4795,7 @@ class FCS_Fixer():
             bin_edge += time_trace_sampling_macro_time_bins
             
         # Go back to photons to determine which ones are in burst
-        photon_is_burst = np.zeros_like(macro_times, dtype = np.bool8)
+        photon_is_burst = np.zeros_like(macro_times, dtype = bool)
         
         # Iterate over burst bins and annotate the photons in that bin
         for i_burst_bin in burst_bin_indices:
@@ -5151,7 +4813,7 @@ class FCS_Fixer():
             
         else:
             # Store dummy
-            self._weights_burst_removal = np.ones_like(macro_times, dtype = np.bool8)
+            self._weights_burst_removal = np.ones_like(macro_times, dtype = bool)
         
         
         if update_macro_times:
@@ -5290,7 +4952,7 @@ class FCS_Fixer():
             elif multi_channel_handling != "SUM":
                 # Implies "OR" or "AND"
             
-                burst_bins_channels = np.zeros(time_traces.shape, dtype = np.bool8)
+                burst_bins_channels = np.zeros(time_traces.shape, dtype = bool)
                 for i_channel in range(time_traces.shape[1]):
                     burst_bins_channels[:, i_channel] = self.threshold_trace(time_traces[:,i_channel], 
                                                                              threshold_alpha = threshold_alpha,
@@ -6167,7 +5829,7 @@ class FCS_Fixer():
                     if update_weights:
                         # Create weights array with zeros for photons to be discarded
                         # and ones for photons to be used.
-                        weights_anomalous_segments = np.zeros((self._n_total_photons,), dtype = np.bool8)
+                        weights_anomalous_segments = np.zeros((self._n_total_photons,), dtype = bool)
                         for start, stop in good_start_stop_sort:
                             weights_anomalous_segments[start:stop] = True
                         
@@ -6295,7 +5957,7 @@ class FCS_Fixer():
         
         channels_spec_norm = self.check_channels_spec(channels_spec)
         
-        micro_time_mask = np.zeros((self._n_micro_time_bins), dtype=np.bool8)
+        micro_time_mask = np.zeros((self._n_micro_time_bins), dtype=bool)
 
         micro_time_cutoffs = channels_spec_norm[1][0]
         micro_time_gate_indx = channels_spec_norm[1][1]
@@ -6660,8 +6322,8 @@ class FCS_Fixer():
     
     def get_background_tail_fit(self,
                                    channels_spec,
-                                   irf_peak_center,
-                                   fit_start,
+                                   irf_peak_center = None,
+                                   fit_start = None,
                                    ext_indices = np.array([]),
                                    use_ext_weights = False,
                                    use_drift_correction = False,
@@ -6681,16 +6343,18 @@ class FCS_Fixer():
         channels_spec: 
             Channel configuration specifier for the which photons to correct. 
             See description in self.check_channels_spec() for details.
-        irf_peak_center : Float
+        irf_peak_center : OPTIONAL int
             Peak position of the IRF (as TCSPC bin index), used as reference 
             for estimating the amplitude of the decay. You may want to use 
-            self.find_IRF_position() to find this.
-        fit_start : int
+            self.find_IRF_position() to find this. If not specified, it will default 
+            to the argmax of the TCSPC histogram inspected.
+        fit_start : OPTIONAL int
             index of the TCSPC bin that is the left edge of the fit range. 
             Given that this is intended for tail fitting, it should definitely 
             be > irf_peak_center. Depends on the data, but a good start may be 
             irf_peak_center + 5 * irf_peak_fwhm as determined from 
-            self.find_IRF_position().
+            self.find_IRF_position(). If not specified, it will default to 2 ns
+            right of irf_peak_center. 
         ext_indices :
             OPTIONAL np.array Externally specified indices of photons in the 
             self.photon_data tttr object to use.
@@ -6731,10 +6395,7 @@ class FCS_Fixer():
 
         '''
         
-        # Input check
-        if not isint(fit_start) or not (fit_start > irf_peak_center):
-            raise ValueError('Invalid input for fit_start. Must be int > irf_peak_center.')
-            
+        # Input check            
         channels_spec_norm = self.check_channels_spec(channels_spec)
         
         # Get TCSPC for fitting
@@ -6747,6 +6408,22 @@ class FCS_Fixer():
                                                     use_mse_filter = use_mse_filter,
                                                     suppress_logging = suppress_logging,
                                                     calling_function = 'get_background_tail_fit')
+
+        if isint(irf_peak_center):
+            pass
+        elif irf_peak_center == None:
+            irf_peak_center = np.argmax(tcspc_y)
+        else:
+            raise ValueError('Invalid input for irf_peak_center. Must be int.')
+            
+
+        if isint(fit_start) and (fit_start > irf_peak_center):
+            pass
+        elif fit_start == None:
+            fit_start = np.uint64(irf_peak_center + np.ceil(2E-9 / self.micro_time_resolution))
+        else:
+            raise ValueError('Invalid input for fit_start. Must be int > irf_peak_center.')
+
 
         # Crop a little further to ensure that we perform a tail fit only, rather than fitting the peak
         tail_fit_use = tcspc_x >= fit_start
@@ -6986,7 +6663,7 @@ class FCS_Fixer():
             # Now we need a slightly complicated logical expression. This checks if 
             # tcspc_x covers everything within the micro time range specified in channels_spec.
             micro_time_mask = self.get_micro_time_mask(channels_spec_norm)
-            tcspc_x_mask = np.zeros((self._n_micro_time_bins), dtype = np.bool8)
+            tcspc_x_mask = np.zeros((self._n_micro_time_bins), dtype = bool)
             tcspc_x_mask[tcspc_x] = True
             
             if np.any(np.logical_xor(tcspc_x_mask, micro_time_mask)):
@@ -7503,9 +7180,7 @@ class FCS_Fixer():
             See description in self.check_channels_spec() for details.
         use_drift_correction :
             OPTIONAL bool with default False. Whether to consider photon weights 
-            from undrifting in photon weights. Keep in mind that you would 
-            typically use this function as part of the calculation to DETERMINE
-            the undrift weights, so think twice about the use here.
+            from undrifting in photon weights.
         use_burst_removal :
             OPTIONAL bool. Specifies whether or not to use the attributes 
             self._macro_time_correction_burst_removal and self._weights_burst_removal to mask out 
@@ -7908,3 +7583,346 @@ class FCS_Fixer():
                         self.write_to_logfile(log_message = 'Could not construct sum channel PC(M)H. Logging traceback:' + traceback.format_exc(),
                                               calling_function = 'run_standard_pipeline')
 
+        return None # END of function, no object to return
+    
+    
+def run_standard_pipeline_all_channels(in_path,
+                                       tau_min,
+                                       tau_max, 
+                                       sampling,
+                                       use_calibrated_AP_subtraction,
+                                       use_burst_removal,
+                                       use_drift_correction,
+                                       use_mse_filter,
+                                       use_flcs_bg_corr,
+                                       default_uncertainty_method = 'Wohland',
+                                       write_intermediate_ccs = False,
+                                       write_pcmh = True,
+                                       afterpulsing_params_path = '',
+                                       list_of_channel_pairs = [],
+                                       cross_corr_symm = False,
+                                       correlation_method = 'wahl',
+                                       out_dir = '',
+                                       job_name = ''):
+    '''
+    Load a file into FCS_Fixer, and run the standard pipeline in all
+    channel combinations available.
+
+    Parameters
+    ----------
+    in_path : 
+        Path to raw data.
+    tau_min, tau_max : 
+        Floats. Minimum and maximum lag time of correlation in seconds, 
+        respectively.
+    sampling : 
+        Int. Density of sampling of correlation function.
+    use_calibrated_AP_subtraction : 
+        Bool. Whether to use calibrated afterpulsing subtraction (unused
+        for cross-correlation and for auto-correlations if FLCS background 
+        subtraction is used.)
+    use_burst_removal : 
+        Bool. Whether to use burst removal filter.
+    use_drift_correction : 
+        Bool. Whether to use bleaching/drift correction.
+    use_mse_filter : 
+        Bool. Whether to use MSE-based removal of measurement time segments 
+        with anomalous correlation function.
+    use_flcs_bg_corr : 
+        Bool. Whether to use FLCS to remove laser-independent background.
+    default_uncertainty_method : 
+        OPTIONAL string with default 'Wohland'. Alternative is 'Bootstrap'.
+        Choice of uncertainty calculation method to be used by FCS_Fixer.get_correlation_uncertainty()
+        If 'Wohland' is chosen, FCS_Fixer.get_Wohland_SD() is used as the default
+        method of standard deviation calculation, and FCS_Fixer.get_bootstrap_SD()
+        as the backup method. If 'Bootstrap' is chosen, the software will 
+        directly go to FCS_Fixer.get_bootstrap_SD().
+    afterpulsing_params_path :
+        OPTIONAL string/path with default '' (empty). Path to afterpulsing calibration
+        file. Necessary if use_calibrated_AP_subtraction == True, otherwise 
+        ignored.
+    write_intermediate_ccs :
+        OPTIONAL bool with default False. Whether or not to write intermediate
+        FCS output at every filtering step.
+    write_pcmh :
+        OPTIONAL bool with default True. Whether to add PC(M)H export to pipeline.
+    list_of_channel_pairs :
+        OPTIONAL iterable of 2-element iterables of channels_spec tuples, with syntax 
+        as delivered by FCS_Fixer.get_channel_combinations(). Specifies which 
+        correlation operations to perform. If left empty, the software will perform all
+        possible auto- and cross-correlations between channels that have a somewhat 
+        reasonable number of photons in the raw data.
+    cross_corr_symm : 
+        OPTIONAL bool with default False. In case of cross-correlation function
+        calculation, should we assume time symmetry? Doing so increases 
+        signal-to-noise ratio by averaging forward and backward cross
+        correlation. Auto-correlations are not affected.
+    correlation_method : 
+        OPTIONAL string with defaut 'wahl', alternatives 'felekyan', 'laurence'.
+        Denotes which correlation function calculation algorithm to use 
+        (passed into tttrlib.Correlator() class).
+    out_dir :
+        OPTIONAL string with empty str as default. If empty, a subfolder 
+        will be created next to the input file. If a dir is given, the 
+        software will instead create a directory in out_dir that mirrors 
+        the last up to 3 layers of directory hierarchy in in_path and place 
+        the output there - convenient for collecting output from multiple 
+        input experiments.
+    job_name : 
+        OPTIONAL string with default '' (empty). Passed into 
+        FCS_Fixer.write_to_log() as the "calling_function" name from 
+        which high-level methods are being called (for logging).
+
+
+    '''
+    
+    if len(job_name) > 0:
+        print(f'[{job_name}] Processing {in_path}...')
+    
+    if os.path.splitext(in_path)[1] == '.ptu':
+        photon_data = tttrlib.TTTR(in_path,'PTU')
+        
+        
+    elif os.path.splitext(in_path)[1] == '.spc':
+        photon_data = tttrlib.TTTR(in_path,'SPC-130')
+
+        
+    in_dir, in_file = os.path.split(in_path)
+    out_name_common = os.path.splitext(in_file)[0]
+    
+    if out_dir == '':
+        out_path = os.path.join(in_dir, out_name_common + '_' + datetime.datetime.now().strftime("%Y%m%d_%H%M"))
+        
+    elif type(out_dir) == str:
+        # We have an excplicit out_dir to use
+        
+        # First sequentially split the in_dir to mirror up to 3 hierarchy levels
+        dir_levels = 0
+        try:
+            tmpdir, out_dir1 = os.path.split(in_dir)
+            dir_levels += 1
+        except:
+            pass
+        
+        try:
+            tmpdir, out_dir2 = os.path.split(tmpdir)
+            dir_levels += 1
+        except:
+            pass
+        
+        try:
+            _, out_dir3 = os.path.split(tmpdir)
+            dir_levels += 1
+        except:
+            pass
+        
+        if dir_levels == 3:
+            out_dir = os.path.join(out_dir, out_dir3)
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+                
+        if dir_levels >= 2:
+            out_dir = os.path.join(out_dir, out_dir2)
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+
+        if dir_levels >= 1:
+            out_dir = os.path.join(out_dir, out_dir1)
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+            
+        # Complete out_path
+        out_path = os.path.join(out_dir, out_name_common + '_' + datetime.datetime.now().strftime("%Y%m%d_%H%M"))
+
+    fixer = FCS_Fixer(photon_data = photon_data, 
+                       out_path = out_path,
+                       tau_min = tau_min,
+                       tau_max = tau_max,
+                       sampling = sampling,
+                       cross_corr_symm = cross_corr_symm,
+                       correlation_method = correlation_method,
+                       subtract_afterpulsing = use_calibrated_AP_subtraction,
+                       afterpulsing_params_path = afterpulsing_params_path,
+                       write_results = True,
+                       include_header = False,
+                       write_log = True)
+    fixer.update_params()
+    
+    
+    # Auto-detect all channels in the file and enumerate all combinations to correlate, if not specified
+    if list_of_channel_pairs == []:
+        list_of_channel_pairs = fixer.get_channel_combinations(min_photons = 1000)
+
+    # Perform all correlations
+    for channels_spec_1, channels_spec_2 in list_of_channel_pairs:
+        
+        try: 
+            fixer.run_standard_pipeline(channels_spec_1,
+                                        channels_spec_2,
+                                        use_burst_removal,
+                                        use_drift_correction,
+                                        use_mse_filter,
+                                        use_flcs_bg_corr,
+                                        default_uncertainty_method = default_uncertainty_method,
+                                        write_intermediate_ccs = write_intermediate_ccs,
+                                        write_pcmh = write_pcmh,
+                                        calling_function = job_name)
+
+        except:
+            # If this channel combination failed, write that to log, and continue with next
+            fixer.write_to_logfile(log_header = 'Error: Logging traceback.',
+                                     log_message = traceback.format_exc(),
+                                     calling_function = job_name)
+                                     
+            # pass # just skip if this channel combination failed
+
+class Parallel_scheduler():
+    # Relatively simple class wrapping FCS_Fixer to run the 
+    # "standard pipeline" using parallel processing
+    # Honestly, with the current structure probably not that much point in the 
+    # Class-based structure, could as well have written it with a single function,
+    # but whatever. 
+    
+    
+    def __init__(self,
+                 in_paths,
+                 tau_min = 1E-6,
+                 tau_max = 1.,  
+                 sampling = 6,
+                 correlation_method = 'wahl',
+                 cross_corr_symm = False,
+                 use_calibrated_AP_subtraction = False,
+                 afterpulsing_params_path = '',
+                 list_of_channel_pairs = [],
+                 use_burst_removal = False,
+                 use_drift_correction = False,
+                 use_mse_filter = False,
+                 use_flcs_bg_corr = False,
+                 default_uncertainty_method = 'Wohland',
+                 write_intermediate_ccs = False,
+                 write_pcmh = True,
+                 out_dir = '',
+                 process_count = os.cpu_count() // 2
+                 ):
+        
+        '''
+        Set up the global settings for parallel processing
+
+        Parameters
+        ----------
+        in_paths : 
+            List of paths to raw data.
+        tau_min, tau_max : TYPE, optional
+            OPTIONAL Floats. Minimum and maximum lag time of correlation in seconds, 
+            respectively, with defaults 1E-6 and 1.
+        sampling : 
+            OPTIONAL Int with default 6. Density of sampling of correlation function.
+        correlation_method : 
+            OPTIONAL string with defaut 'wahl', alternatives 'felekyan', 'laurence'. Denotes 
+            which correlation function calculation algorithm to use (passed into
+            tttrlib.Correlator() class).
+        cross_corr_symm : 
+            OPTIONAL bool with default False. In case of cross-correlation function
+            calculation, should we assume time symmetry? Doing so increases 
+            signal-to-noise ratio by averaging forward and backward cross
+            correlation. Auto-correlations are not affected.
+        use_calibrated_AP_subtraction : 
+            OPTIONAL bool with default False. Whether to use calibrated
+            afterpulsing subtraction (unused for cross-correlation and for
+            auto-correlations if FLCS background subtraction is used.)
+        afterpulsing_params_path :
+            OPTIONAL string/path with default '' (empty). Path to afterpulsing calibration
+            file. Necessary if use_calibrated_AP_subtraction == True, otherwise 
+            ignored.
+        list_of_channel_pairs :
+            OPTIONAL iterable of 2-element iterables of channels_spec tuples, with syntax 
+            as delivered by FCS_Fixer.get_channel_combinations(). Specifies which 
+            correlation operations to perform. If left empty, the software will perform all
+            possible auto- and cross-correlations between channels that have a somewhat 
+            reasonable number of photons in the raw data.
+        use_burst_removal : 
+            OPTIONAL bool with default False. Whether to use burst removal filter.
+        use_drift_correction : 
+            OPTIONAL bool with default False. Whether to use bleaching/drift correction
+        use_mse_filter : 
+            OPTIONAL bool with default False. Whether to use MSE-based removal
+            of measurement time segments with anomalous correlation function.
+        use_flcs_bg_corr : 
+            OPTIONAL bool with default False. Whether to use FLCS to remove 
+            laser-independent background.
+        default_uncertainty_method : 
+            OPTIONAL string with default 'Wohland'. Alternative is 'Bootstrap'.
+            Choice of uncertainty calculation method to be used by FCS_Fixer.get_correlation_uncertainty()
+            If 'Wohland' is chosen, FCS_Fixer.get_Wohland_SD() is used as the default
+            method of standard deviation calculation, and FCS_Fixer.get_bootstrap_SD()
+            as the backup method. If 'Bootstrap' is chosen, the software will 
+            directly go to FCS_Fixer.get_bootstrap_SD().
+        write_intermediate_ccs :
+            OPTIONAL bool with default False. Whether or not to write intermediate
+            FCS output at every filtering step.
+        write_pcmh :
+            OPTIONAL bool with default True. Whether to add PC(M)H export to pipeline.
+        out_dir :
+            OPTIONAL string with empty str as default. If empty, a subfolder 
+            will be created next to the input file. If a dir is given, the 
+            software will instead create a directory in out_dir that mirrors 
+            the last up to 3 layers of directory hierarchy in in_path and place 
+            the output there - convenient for collecting output from multiple 
+            input experiments.
+        process_count : 
+            OPTIONAL int. Number of parallel processing cores to use. Default 
+            is half of available CPUs.
+        '''
+        self.in_paths = in_paths
+        self.tau_min = tau_min
+        self.tau_max = tau_max
+        self.sampling = sampling
+        self.correlation_method = correlation_method
+        self.cross_corr_symm = cross_corr_symm
+        self.use_calibrated_AP_subtraction = use_calibrated_AP_subtraction
+        self.afterpulsing_params_path = afterpulsing_params_path
+        self.list_of_channel_pairs = list_of_channel_pairs
+        self.use_burst_removal = use_burst_removal
+        self.use_drift_correction = use_drift_correction
+        self.use_mse_filter = use_mse_filter
+        self.use_flcs_bg_corr = use_flcs_bg_corr
+        self.default_uncertainty_method = default_uncertainty_method
+        self.write_intermediate_ccs = write_intermediate_ccs
+        self.write_pcmh = write_pcmh
+        self.out_dir = out_dir
+        self.process_count = process_count
+                
+    def run_parallel_processing(self):
+        '''
+        Assign and execute parallel jobs.
+
+        '''
+        with multiprocessing.Pool(processes=self.process_count) as pool:
+            try:
+                # Careful in editing this, the order matters!
+                args = [(in_path,
+                         self.tau_min,
+                         self.tau_max, 
+                         self.sampling,
+                         self.use_calibrated_AP_subtraction,
+                         self.use_burst_removal,
+                         self.use_drift_correction,
+                         self.use_mse_filter,
+                         self.use_flcs_bg_corr,
+                         self.default_uncertainty_method,
+                         self.write_intermediate_ccs,
+                         self.write_pcmh,
+                         self.afterpulsing_params_path,
+                         self.list_of_channel_pairs,
+                         self.cross_corr_symm,
+                         self.correlation_method,
+                         self.out_dir,
+                         f'process_{process_id}') for process_id, in_path in enumerate(self.in_paths)]
+                pool.starmap(run_standard_pipeline_all_channels, args)
+            except Exception:
+                traceback.print_exc()
+
+
+
+    
+    

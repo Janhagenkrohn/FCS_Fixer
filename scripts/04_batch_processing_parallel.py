@@ -16,8 +16,9 @@ Parallel_scheduler accepts essentially the same "global" parameters as FCS_Fixer
 itself, with the addition of in_paths, which is a list of paths to the files to process,
 and some added technical parameters.
 
-Parallel_scheduler.run_parallel_processing() then does essentially what 03_batch_processing.py
-does. Currently you have no access to the process parameters except those that 
+Parallel_scheduler.run_parallel_processing() then does mostly what 
+03_batch_processing.py does. Minor differences, but conceptually the same.
+Currently you have no access to the process parameters except those that 
 are listed in this script already, though. In other words, all filters are run 
 with default settings, and no micro time gating is applied.
 
@@ -52,7 +53,7 @@ tau_min = 1E-6
 tau_max = 1.0
 sampling = 6
 cross_corr_symm = True
-correlation_method = 'default'
+correlation_method = 'wahl'
 default_uncertainty_method = 'Wohland'
 list_of_channel_pairs = [] # Empty list = auto-detect and use all options
 
@@ -67,9 +68,11 @@ use_bleaching_correction = True
 use_mse_filter = True
 use_flcs_bg_subtraction = True
 
+# Export settings
+write_intermediate_ccs = False # Export correlation functions at all steps, or only at the end
+write_pcmh = False # Photon counting (multiple) histograms export
+out_dir = '' # Where to collect results? (empty string for subdir next to data)
 
-# Where to collect results?
-out_dir = ''
 
 #%% Go through diretories and find all .ptu files, creating effectively pairs of directory, file for each of them
 _file_names=[]
@@ -85,25 +88,34 @@ for dir_name in dir_names:
 #%% Iterate over data
 in_paths=[os.path.join(_dir_names[i],file_name) for i, file_name in enumerate(_file_names)]
 
-scheduler = FCS_Fixer.Parallel_scheduler(in_paths,
-                                         tau_min = tau_min,
-                                         tau_max = tau_max,  
-                                         sampling = sampling,
-                                         correlation_method = correlation_method,
-                                         cross_corr_symm = cross_corr_symm,
-                                         use_calibrated_AP_subtraction = use_calibrated_AP_subtraction,
-                                         afterpulsing_params_path = afterpulsing_params_path,
-                                         list_of_channel_pairs = list_of_channel_pairs,
-                                         use_burst_removal = use_burst_removal,
-                                         use_drift_correction = use_bleaching_correction,
-                                         use_mse_filter = use_mse_filter,
-                                         use_flcs_bg_corr = use_flcs_bg_subtraction,
-                                         default_uncertainty_method = default_uncertainty_method,
-                                         out_dir = out_dir
-                                         )
 
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    scheduler.run_parallel_processing(process_count)
+
+if __name__ == "__main__":
+    # Create scheduler instance
+    
+    scheduler = FCS_Fixer.Parallel_scheduler(in_paths,
+                                             tau_min = tau_min,
+                                             tau_max = tau_max,  
+                                             sampling = sampling,
+                                             correlation_method = correlation_method,
+                                             cross_corr_symm = cross_corr_symm,
+                                             use_calibrated_AP_subtraction = use_calibrated_AP_subtraction,
+                                             afterpulsing_params_path = afterpulsing_params_path,
+                                             list_of_channel_pairs = list_of_channel_pairs,
+                                             use_burst_removal = use_burst_removal,
+                                             use_drift_correction = use_bleaching_correction,
+                                             use_mse_filter = use_mse_filter,
+                                             use_flcs_bg_corr = use_flcs_bg_subtraction,
+                                             default_uncertainty_method = default_uncertainty_method,
+                                             write_intermediate_ccs = write_intermediate_ccs,
+                                             write_pcmh = write_pcmh,
+                                             out_dir = out_dir,
+                                             process_count = process_count
+                                             )
+    
+    # Run parallel processing
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        scheduler.run_parallel_processing()
 
 print('Job done.')

@@ -95,7 +95,7 @@ for i_file, in_path in enumerate(in_paths):
                                                     tau_max = tau_max,
                                                     sampling = sampling,
                                                     cross_corr_symm = cross_corr_symm,
-                                                    correlation_method = 'default',
+                                                    correlation_method = 'wahl',
                                                     subtract_afterpulsing = use_calibrated_AP_subtraction,
                                                     afterpulsing_params_path = afterpulsing_params_path,
                                                     write_results = True,
@@ -257,15 +257,13 @@ for i_file, in_path in enumerate(in_paths):
                                                                    calling_function = script_name)
                     
                     # Find suitable range for tail fitting, and perform tail fit
-                    peak_position = np.argmax(tcspc_y)
-                    fit_start = np.uint64(peak_position + np.ceil(2E-9 / fixer.micro_time_resolution))
                     flat_background, _ = fixer.get_background_tail_fit(channels_spec_1, 
-                                                                         peak_position, 
-                                                                         fit_start,
-                                                                         use_drift_correction = use_bleaching_correction,
-                                                                         use_burst_removal = use_burst_removal,
-                                                                         use_mse_filter = use_mse_filter,
-                                                                         calling_function = script_name)
+                                                                       irf_peak_center = None, # Use default
+                                                                       fit_start = None, # Use default
+                                                                       use_drift_correction = use_bleaching_correction,
+                                                                       use_burst_removal = use_burst_removal,
+                                                                       use_mse_filter = use_mse_filter,
+                                                                       calling_function = script_name)
                     
                     # Get FLCS weights
                     _ = fixer.get_flcs_background_filter(tcspc_x, 
@@ -285,15 +283,13 @@ for i_file, in_path in enumerate(in_paths):
                                                                        calling_function = script_name)
                         
                         # Find suitable range for tail fitting, and perform tail fit
-                        peak_position = np.argmax(tcspc_y)
-                        fit_start = np.uint64(peak_position + np.ceil(2E-9 / fixer.micro_time_resolution))
                         flat_background, _ = fixer.get_background_tail_fit(channels_spec_2, 
-                                                                             peak_position, 
-                                                                             fit_start,
-                                                                             use_drift_correction = use_bleaching_correction,
-                                                                             use_burst_removal = use_burst_removal,
-                                                                             use_mse_filter = use_mse_filter,
-                                                                             calling_function = script_name)
+                                                                           irf_peak_center = None, # Use default
+                                                                           fit_start = None, # Use default
+                                                                           use_drift_correction = use_bleaching_correction,
+                                                                           use_burst_removal = use_burst_removal,
+                                                                           use_mse_filter = use_mse_filter,
+                                                                           calling_function = script_name)
                         
                         # Get FLCS weights
                         _ = fixer.get_flcs_background_filter(tcspc_x, 

@@ -33,42 +33,38 @@ Note that FCS_Fixer is compatible with Fluorescence Cross-Correlation spectrosco
 
 ## Weaknesses
 - No Graphical User Interface.
-- Tested only in Linux 64 environment, and only on PicoQuant .ptu data.
+- Tested only in Windows environment, and only on PicoQuant .ptu data.
+- Tested for Conda environments built around Python 3.10 and tttrlib 0.26
 - No support for FCS raw data formats that are not compatible with tttrlib.
-- Incompatible with recent tttrlib versions: I did not trace exactly in which version the change was made, but the tttrlib.Correlator() changed behavior at some point after 0.0.19, and the new behavior is currently incompable with FCS_Fixer.
 - Fully Python-based implementation means that **performance is relatively low**. In fact, we are aware that various methods could be more efficient even with pure Python, but we opted against that, sometimes for reasons of flexibility, sometimes simply because weI prioritized moving forward with development over writing high-performance code. We may improve on some of these later on.
 
 
 ## Installation
 Currently, actual installation of FCS_Fixer into a Python environment is not set up. Instead, we explicitly import it from the directory of the repo. We may look into that at a later point....
 
-For now, let's look at how to set up the correct Python environment. Use the Anaconda distribution of Python. As mentioned above, the pipeline described here is only tested with Linux 64, no promises regarding what will happen on other operation system.
+For now, let's look at how to set up the correct Python environment. Use the Anaconda distribution of Python. The pipeline described here is currently tested in Windows environments, but there is a good chance it should work on Linux as well.
+
+The compatibility is currently ensured for a typical [theatRICS](https://github.com/yusuf-qutbuddin/theatRICS) conda environment.
 
 ### Create environment
 In the command shell, run:
 
-`conda create --name tttr python=3.7.11` 
+`conda create --name tttr python=3.10` 
 
 `tttr` is just the environment name we use, you may replace that with whatever you like.
 
 ### Install required packages
- Activate the environment and install some common packages, nothing fancy at this point:
- 
+Activate the environment and install the required packages:
+
 `conda activate tttr`
 
-`conda install numpy scipy matplotlib pandas`
+`pip install theatrics`
 
-`pip install jupyter lmfit uncertainties`
+Installing theatRICS will also install all the dependencies for FCS_Fixer, nothing else is needed.
 
 Additionally, you'll want to install Spyder or another IDE:
 
 `conda install spyder`
-
-Installing tttrlib is a little more error-prone. Be careful about the version:
-
-`conda install -c "tpeulen/label/old" tttrlib=0.0.19`
-
-Check the tttrlib installation guidelines if this command does not work for you.
 
 ### Getting FCS_Fixer itself
 Simply clone the GitHub repo into some local directory on your machine, and you're good to go. For testing, `cd` into your local copy of the repo. Inside the repo, try to run one of the Jupyter Notebooks. The notebook 01_overview.ipynb also explains how to import the module for executing code.
